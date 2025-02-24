@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factories;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,7 +35,7 @@ class Transaction extends Model
      */
     public function accountSource()
     {
-        return $this->belongsToMany(Account::class, "account_source_id", "id");
+        return $this->belongsTo(Account::class, "account_source_id", "id");
     }
     /**
      * Get the attributes that should be cast.
@@ -44,6 +44,6 @@ class Transaction extends Model
      */
     public function accountDestination()
     {
-        return $this->belongsToMany(Account::class, "account_destination_id", "id");
+        return $this->belongsTo(Account::class, "account_destination_id", "id");
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Factories;
 
+use App\Models\User;
 
 class UserFactory
 {

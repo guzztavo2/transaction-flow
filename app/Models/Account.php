@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factories;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,12 +30,32 @@ class Account extends Model
         ];
     }
     /**
-     * Get the attributes that should be cast.
+     * Get the model of user
      *
      * @return User
      */
     public function user()
     {
-        return $this->belongsToMany(User::class, "user_id", "id");
+        return $this->belongsTo(User::class, "user_id", "id");
     }
+    /**
+     * Get the many transactions
+     *
+     * @return Transaction
+     */
+    public function transactionsSource()
+    {
+        return $this->hasMany(Transaction::class, "account_source_id", "id");
+    }
+    /**
+     * Get the many transactions
+     *
+     * @return Transaction
+     */
+    public function transactionsDestination()
+    {
+        return $this->hasMany(Transaction::class, "account_destination_id", "id");
+    }
+
+
 }

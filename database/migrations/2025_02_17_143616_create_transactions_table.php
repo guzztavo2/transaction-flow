@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger("account_source_id");
             $table->unsignedBigInteger("account_destination_id");
             $table->unsignedInteger("type");
-            $table->decimal("value");
+            $table->decimal("amount");
             $table->unsignedInteger("status");
             $table->timestamps();
             $table->index(["id"]);

@@ -2,6 +2,8 @@
 
 namespace App\Factories;
 
+use App\Models\Transaction;
+
 class TransactionLogFactory
 {
     public static function create(string $message)

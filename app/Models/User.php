@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factories;
+namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -45,5 +45,10 @@ class User extends Authenticatable
             'updated_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class, "user_id", "id");
     }
 }

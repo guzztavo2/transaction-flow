@@ -26,11 +26,11 @@ class FraudAnalisysFactory
 
     public static function find(int $id)
     {
-        return Transaction::find($id);
+        return FraudAnalisys::find($id);
     }
 
     public static function query()
     {
-        return Transaction::query();
+        return FraudAnalisys::query();
     }
 }

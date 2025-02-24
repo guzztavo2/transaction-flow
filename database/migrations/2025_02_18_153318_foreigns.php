@@ -24,9 +24,6 @@ return new class extends Migration
         Schema::table('fraud_analisys', function (Blueprint $table) {
             $table->foreign("transaction_id")->references("id")->on("transactions");
         });
-        Schema::table('deposits', function (Blueprint $table) {
-            $table->foreign("account_id")->references("id")->on("accounts");
-        });
     }
 
     /**
@@ -35,20 +32,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('accounts', function (Blueprint $table) {
-            $table->dropForeign('user_id')->references("id")->on("users");
+            $table->dropForeign(['user_id']);
         });
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropForeign("account_source")->references("id")->on("accounts");
-            $table->dropForeign("account_destination")->references("id")->on("accounts");
+            $table->dropForeign(["account_source_id"]);
+            $table->dropForeign(["account_destination_id"]);
         });
         Schema::table('transaction_logs', function (Blueprint $table) {
-            $table->dropForeign("transaction_id")->references("id")->on("transactions");
+            $table->dropForeign(["transaction_id"]);
         });
         Schema::table('fraud_analisys', function (Blueprint $table) {
-            $table->dropForeign("transaction_id")->references("id")->on("transactios");
-        });
-        Schema::table('deposits', function (Blueprint $table) {
-            $table->dropForeign("account_id")->references("id")->on("accounts");
+            $table->dropForeign(["transaction_id"]);
         });
     }
 };

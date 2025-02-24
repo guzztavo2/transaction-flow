@@ -2,8 +2,8 @@
 
 namespace App\Factories;
 
+use App\Models\Transaction;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 
 class TransactionFactory
 {
