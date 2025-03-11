@@ -57,5 +57,20 @@ class Account extends Model
         return $this->hasMany(Transaction::class, "account_destination_id", "id");
     }
 
+    public static function new(int | User $user_id, string $bank, string $agency, string $number_account, float $balance)
+    {
+        if (gettype($user_id) == 'int')
+            $user_id = User::find($user_id);
 
+        return Account::create(
+            [
+                'user_id' => $user_id->id,
+                'bank' => $bank,
+                'agency' => $agency,
+                'number_account' => $number_account,
+                'balance' => $balance
+            ]
+        );
+    }
+    
 }

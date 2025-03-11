@@ -1,0 +1,2 @@
+Créditos idioma PT-BR Laravel:
+https://github.com/lucascudo/laravel-pt-BR-localization

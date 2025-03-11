@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Account::class, "user_id", "id");
     }
+
+    public static function new(string $name, string $email, string $password)
+    {
+        return User::create(['name' => $name, 'email' => $email, 'password' => $password]);
+    }
 }

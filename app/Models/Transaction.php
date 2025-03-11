@@ -46,4 +46,41 @@ class Transaction extends Model
     {
         return $this->belongsTo(Account::class, "account_destination_id", "id");
     }
+
+    public const TYPE_FAIL = 0, TYPE_DEPOSIT = 1, TYPE_LOOT = 2;
+    public const STATUS_FAIL = 0, STATUS_DONE = 1, STATUS_PENDING = 2;
+
+    public static function new(
+        int | Account $account_source,
+        int | Account $account_destination,
+        int $type,
+        float $value,
+        int $status
+    ) {
+        if ($type < 0 || $type > Transaction::TYPE_LOOT)
+            throw new \Exception("Transaction not good selected");
+
+        if ($status < 0 || $status > Transaction::STATUS_PENDING)
+            throw new \Exception("Transaction not good selected");
+
+        if (gettype($account_source) == "int")
+            $account_source = Account::find($account_source);
+        if (is_null($account_source))
+            throw new \Exception("Account not localized");
+
+        if (gettype($account_destination) == "int")
+            $account_destination = Account::find($account_destination);
+        if (is_null($account_destination))
+            throw new \Exception("Account not localized");
+
+        return Transaction::create(
+            [
+                'account_source' => $account_source->id,
+                'account_destination' => $account_destination->id,
+                'type' => $type,
+                'value' => $value,
+                'status' => $status
+            ]
+        );
+    }
 }

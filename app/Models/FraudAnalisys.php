@@ -28,4 +28,22 @@ class FraudAnalisys extends Model
             'created_at' => 'datetime'
         ];
     }
+
+    public const STATUS_FAIL = 0, STATUS_DONE = 1, STATUS_PENDING = 2;
+
+    public static function new(
+        string $reason,
+        int $status
+    ) {
+        if ($status < 0 || $status > FraudAnalisys::STATUS_PENDING)
+            return null;
+
+        return FraudAnalisys::create(
+            [
+                'reason' => $reason,
+                'status' => $status
+            ]
+        );
+    }
+
 }

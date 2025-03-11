@@ -30,4 +30,9 @@ class TransactionLog extends Model
     {
         return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
     }
+
+    public static function new(string $message)
+    {
+        return Transaction::create(['message' => $message]);
+    }
 }
