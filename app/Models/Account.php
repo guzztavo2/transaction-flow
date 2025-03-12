@@ -15,7 +15,8 @@ class Account extends Model
         'bank',
         'agency',
         'number_account',
-        'balance'
+        'balance',
+        'user_id'
     ];
 
     /**
@@ -32,7 +33,7 @@ class Account extends Model
     /**
      * Get the model of user
      *
-     * @return User
+     * @return 
      */
     public function user()
     {
@@ -41,7 +42,7 @@ class Account extends Model
     /**
      * Get the many transactions
      *
-     * @return Transaction
+     * @return $this->HasMany
      */
     public function transactionsSource()
     {
@@ -50,7 +51,7 @@ class Account extends Model
     /**
      * Get the many transactions
      *
-     * @return Transaction
+     * @return $this->HasMany
      */
     public function transactionsDestination()
     {
@@ -59,7 +60,7 @@ class Account extends Model
 
     public static function new(int | User $user_id, string $bank, string $agency, string $number_account, float $balance)
     {
-        if (gettype($user_id) == 'int')
+        if (gettype($user_id) == 'integer')
             $user_id = User::find($user_id);
 
         return Account::create(

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Services\AuthService;
 
+
 class AuthController extends Controller
 {
     private AuthService $service;
@@ -13,23 +14,39 @@ class AuthController extends Controller
     {
         $this->service = $service;
     }
+
     public function register(Request $request)
     {
-        $this->service->register($request->toArray());
+        return $this->service->register($request);
     }
 
     public function login(Request $request)
     {
-        $this->service->login($request->toArray());
+        return $this->service->login($request);
     }
 
     public function changePassword(Request $request)
     {
-        $this->service->changePassword($request->toArray());
+        return $this->service->changePassword($request);
     }
 
     public function resetPassword(Request $request)
     {
-        $this->service->resetPassword($request->toArray());
+        return $this->service->resetPassword($request);
     }
+    public function me()
+    {
+        return $this->service->me();
+    }
+
+    public function logout()
+    {
+        return $this->service->logout();
+    }
+  
+    public function refresh()
+    {
+        return $this->service->refresh();
+    }
+ 
 }
