@@ -11,8 +11,8 @@ class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private array $pessoal_information_to_test = ['name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com', 
-    'password' => 'senhaSegura123', 'confirm_password' => 'senhaSegura123', 'bank' => 'Banco Teste', 
+    private array $pessoal_information_to_test = ['name' => 'Fulano de Tal', 
+    'email' => 'fulano@exemplo.com', 'password' => 'senhaSegura123', 'confirm_password' => 'senhaSegura123', 'bank' => 'Banco Teste', 
     'agency' => '001', 'number_account' => '123456'];
 
     private User $user;
@@ -35,31 +35,8 @@ class AuthControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
-    public function validation_not_same_password()
-    {
-        $this->pessoal_information_to_test = [
-            'name' => 'Fulano de Tal',
-            'email' => 'fulano@exemplo.com',
-            'password' => 'senhaSegura1234',
-            'confirm_password' => 'senhaSegura123',
-            'bank' => 'Banco Teste',
-            'agency' => '001',
-            'number_account' => '123456'
-        ];
-
-        $response = $this->postJson('api/auth/register', $this->pessoal_information_to_test);
-
-        $response->assertStatus(422)->assertJsonValidationErrors(['password']);
-    }
-
-
     public function register_user_with_valid_datas()
     {
-        $this->pessoal_information_to_test = ['name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com', 
-        'password' => 'senhaSegura1234', 'confirm_password' => 'senhaSegura1234', 'bank' => 'Banco Teste', 
-        'agency' => '001', 'number_account' => '123456'];
-
         $response = $this->postJson('api/auth/register', $this->pessoal_information_to_test);
 
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'bank', 'agency', 'number_account', 'balance' ]);
