@@ -21,6 +21,16 @@ services:
       - QUEUE_CONNECTION=redis
       - XDEBUG_CONFIG=client_host=host.docker.internal client_port=9003 start_with_request=yes
       - XDEBUG_MODE=debug
+
+      - MAIL_MAILER=${MAIL_MAILER}
+      - MAIL_SCHEME=${MAIL_SCHEME}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME} 
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - TZ=${APP_TIMEZONE}
   db:
     image: mysql:8.0
     container_name: mysql_db
