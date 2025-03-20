@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Account;
+use App\Notifications\ResetPassword;
+
 class AuthService extends Service
 {
     
@@ -54,14 +56,14 @@ class AuthService extends Service
 
     public function me()
     {
-        $user = auth('api')->user()->toArray();
-        return response()->json($user);
+        $user = auth('api')->user();
+        $user->notify(new ResetPassword());
+        return response()->json($user->toArray());
     }
 
     public function logout()
     {
         auth('api')->logout();
-
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -78,6 +80,8 @@ class AuthService extends Service
             "confirm_password" => ['required', 'max:100', 'string'],
             "password" => ['required', 'max:100', 'string']
         ]);
+
+
     }
 
     public function resetPassword(Request $request)
@@ -86,6 +90,7 @@ class AuthService extends Service
             "name" => ['required', 'max:100', 'string'],
             "email" => ['email:strict,dns,spoof','required', 'max:100', 'string']
         ]);
+
     }
 
     private function respondWithToken($token)
