@@ -45,30 +45,29 @@ class AuthService extends Service
 
         $credentials = request(['email', 'password']);
 
-        if (!$token = auth()->setTTL(7200)->attempt($credentials)) {
+        if (!$token = auth('api')->setTTL(7200)->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
     }
 
-
-
     public function me()
     {
-        return response()->json(auth()->user());
+        $user = auth('api')->user()->toArray();
+        return response()->json($user);
     }
 
     public function logout()
     {
-        auth()->logout();
+        auth('api')->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
 
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        return $this->respondWithToken(auth('api')->refresh());
     }
 
     public function changePassword(Request $request)
@@ -94,7 +93,7 @@ class AuthService extends Service
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth('api')->factory()->getTTL() * 60
         ]);
     }
 }
