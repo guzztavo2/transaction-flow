@@ -9,8 +9,10 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring intl
 
+
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
+# COPY ./xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 RUN apt-get update && apt-get install -y nano
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

@@ -9,10 +9,11 @@ services:
     volumes:
       - .:/var/www
       - /var/www/vendor
-      - ./php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - /etc/php/8.2/cli/conf.d/20-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     ports:
       - "8000:8000"
-
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
