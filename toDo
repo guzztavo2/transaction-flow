@@ -9,7 +9,7 @@
 
 Autenticação e Usuários
     [x] - Register - [x] tested and worked (used phpunit);
-    [x] - Login;
+    [x] - Login - [x] tested and worked (used phpunit);
     [x] - ChangePassword;
     [x] - ResetPassword;
     [x] - Me;

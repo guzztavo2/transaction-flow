@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Services\AuthService;
-
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -34,6 +33,7 @@ class AuthController extends Controller
     {
         return $this->service->resetPassword($request);
     }
+
     public function me()
     {
         return $this->service->me();
@@ -43,10 +43,9 @@ class AuthController extends Controller
     {
         return $this->service->logout();
     }
-  
+
     public function refresh()
     {
         return $this->service->refresh();
     }
- 
 }
