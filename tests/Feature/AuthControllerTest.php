@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     private array $pessoal_information_to_test = [
         'name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com',
@@ -87,7 +87,6 @@ class AuthControllerTest extends TestCase
         $new_password = 'senhaSegura1234';
 
         $response = $this->post('api/auth/change-password', [
-            'email' => $this->pessoal_information_to_test['email'],
             'password' => $this->pessoal_information_to_test['password'],
             'confirm_password' => $this->pessoal_information_to_test['password'],
             'new_password' => $new_password,
@@ -108,14 +107,38 @@ class AuthControllerTest extends TestCase
         return $response;
     }
 
+    public function reset_password()
+    {
+        $this->assertDatabaseHas('users', [
+            'email' => $this->pessoal_information_to_test['email'],
+            'name' => $this->pessoal_information_to_test['name']
+        ]);
+
+        $response = $this->post('api/auth/reset-password', ['email' => $this->pessoal_information_to_test['email']]);
+
+        $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
+        $this->accesToken = $response['access_token'];
+
+        $this->assertDatabaseHas('users', [
+            'email' => $this->pessoal_information_to_test['email'],
+            'name' => $this->pessoal_information_to_test['name']
+        ]);
+
+        $userFromDb = User::where('email', $this->pessoal_information_to_test['email'])->first();
+        $this->assertTrue(Hash::check($new_password, $userFromDb->password));
+
+        return $response;
+    }
+
     /**
      * @test
      */
     public function test_auth_controller()
     {
-        $registerResponse = $this->register_user_with_valid_datas();
+        // $registerResponse = $this->register_user_with_valid_datas();
         $loginResponse = $this->login_user_with_valid_data();
         $getMeResponse = $this->get_user_me();
-        $changePasswordResponse = $this->change_password();
+        // $changePasswordResponse = $this->change_password();
+        $resetPasswordResponse = $this->reset_password();
     }
 }
