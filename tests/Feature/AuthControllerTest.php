@@ -107,17 +107,18 @@ class AuthControllerTest extends TestCase
         return $response;
     }
 
-    public function reset_password()
+    public function change_password_with_token(string $token)
     {
-        $this->assertDatabaseHas('users', [
-            'email' => $this->pessoal_information_to_test['email'],
-            'name' => $this->pessoal_information_to_test['name']
+        $new_password = 'senhaSegura1234';
+
+        $response = $this->post("api/auth/change-password/$token" . '?' . http_build_query(['email' => urlencode($this->pessoal_information_to_test['email'])]), [
+            'password' => $this->pessoal_information_to_test['password'],
+            'confirm_password' => $this->pessoal_information_to_test['password'],
+            'new_password' => $new_password,
+            'confirm_new_password' => $new_password,
         ]);
 
-        $response = $this->post('api/auth/reset-password', ['email' => $this->pessoal_information_to_test['email']]);
-
-        $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
-        $this->accesToken = $response['access_token'];
+        $response->assertStatus(200);
 
         $this->assertDatabaseHas('users', [
             'email' => $this->pessoal_information_to_test['email'],
@@ -130,14 +131,34 @@ class AuthControllerTest extends TestCase
         return $response;
     }
 
+    public function reset_password()
+    {
+        $this->assertDatabaseHas('users', [
+            'email' => $this->pessoal_information_to_test['email'],
+            'name' => $this->pessoal_information_to_test['name']
+        ]);
+
+        $response = $this->post('api/auth/reset-password', ['email' => $this->pessoal_information_to_test['email']]);
+
+        $response->assertStatus(200);
+
+        $userFromDb = User::where('email', $this->pessoal_information_to_test['email'])->first();
+
+        $notification = $userFromDb->notifications()->get()->last();
+        $token = $notification->data['token'];
+
+        $this->change_password_with_token($token);
+        return $response;
+    }
+
     /**
      * @test
      */
     public function test_auth_controller()
     {
-        // $registerResponse = $this->register_user_with_valid_datas();
-        $loginResponse = $this->login_user_with_valid_data();
-        $getMeResponse = $this->get_user_me();
+        $registerResponse = $this->register_user_with_valid_datas();
+        // $loginResponse = $this->login_user_with_valid_data();
+        // $getMeResponse = $this->get_user_me();
         // $changePasswordResponse = $this->change_password();
         $resetPasswordResponse = $this->reset_password();
     }

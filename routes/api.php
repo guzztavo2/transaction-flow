@@ -12,6 +12,7 @@ Route::middleware(['api'])->prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->withoutMiddleware(['api']);
     Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware(['api']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::post('/change-password/{token}', [AuthController::class, 'changePassword'])->withoutMiddleware(['api']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/refresh', [AuthController::class, 'refresh']);

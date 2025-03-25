@@ -19,10 +19,10 @@
 {{-- Action Button --}}
 @isset($actionText)
 <?php
-    $color = match ($level) {
-        'success', 'error' => $level,
-        default => 'primary',
-    };
+$color = match ($level) {
+    'success', 'error' => $level,
+    default => 'primary',
+};
 ?>
 <x-mail::button :url="$actionUrl" :color="$color">
 {{ $actionText }}
@@ -47,8 +47,8 @@
 @isset($actionText)
 <x-slot:subcopy>
 @lang(
-    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser:',
+    "Caso você esteja com problemas para clicar no \":actionText\" botão, copie e cole a url abaixo\n".
+    'Em seu navegador:',
     [
         'actionText' => $actionText,
     ]
