@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Account extends Model
 {
@@ -12,6 +13,7 @@ class Account extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'id',
         'bank',
         'agency',
         'number_account',
@@ -30,15 +32,17 @@ class Account extends Model
             'created_at' => 'datetime'
         ];
     }
+
     /**
      * Get the model of user
      *
-     * @return 
+     * @return
      */
     public function user()
     {
-        return $this->belongsTo(User::class, "user_id", "id");
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
     /**
      * Get the many transactions
      *
@@ -46,8 +50,9 @@ class Account extends Model
      */
     public function transactionsSource()
     {
-        return $this->hasMany(Transaction::class, "account_source_id", "id");
+        return $this->hasMany(Transaction::class, 'account_source_id', 'id');
     }
+
     /**
      * Get the many transactions
      *
@@ -55,16 +60,17 @@ class Account extends Model
      */
     public function transactionsDestination()
     {
-        return $this->hasMany(Transaction::class, "account_destination_id", "id");
+        return $this->hasMany(Transaction::class, 'account_destination_id', 'id');
     }
 
-    public static function new(int | User $user_id, string $bank, string $agency, string $number_account, float $balance)
+    public static function new(int|User $user_id, string $bank, string $agency, string $number_account, float $balance)
     {
         if (gettype($user_id) == 'integer')
             $user_id = User::find($user_id);
 
         return Account::create(
             [
+                'id' => str::uuid()->toString(),
                 'user_id' => $user_id->id,
                 'bank' => $bank,
                 'agency' => $agency,
@@ -73,5 +79,4 @@ class Account extends Model
             ]
         );
     }
-    
 }
