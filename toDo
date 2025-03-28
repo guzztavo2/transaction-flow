@@ -10,11 +10,11 @@
 Autenticação e Usuários
     [x] - Register - [x] tested and worked (used phpunit);
     [x] - Login - [x] tested and worked (used phpunit);
-    [x] - ChangePassword;
-    [x] - ResetPassword;
-    [x] - Me;
-    [x] - Logout;
-    [x] - Refresh;
+    [x] - ChangePassword - [x] tested and worked (used phpunit);
+    [x] - ResetPassword - [x] tested and worked (used phpunit);
+    [x] - Me - [x] tested and worked (used phpunit);
+    [x] - Logout - [x] tested and worked (used phpunit);
+    [x] - Refresh - [x] tested and worked (used phpunit);
 
 
 Contas e Saldo

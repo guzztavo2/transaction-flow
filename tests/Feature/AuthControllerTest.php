@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     private array $pessoal_information_to_test = [
         'name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com',
@@ -41,43 +41,42 @@ class AuthControllerTest extends TestCase
             ]);
     }
 
-    public function register_user_with_valid_datas()
+    public function register_user_with_valid_datas(array $user_to_created)
     {
         $response = $this->postJson('api/auth/register', $this->pessoal_information_to_test);
 
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'bank', 'agency', 'number_account', 'balance']);
 
         $this->assertDatabaseHas('users', [
-            'email' => $this->pessoal_information_to_test['email'],
-            'name' => $this->pessoal_information_to_test['name']
+            'email' => $user_to_created['email'],
+            'name' => $user_to_created['name']
         ]);
 
         // Verifica se a conta foi criada
         $this->user = User::first();
 
         $this->assertDatabaseHas('accounts', ['user_id' => $this->user->id,
-            'bank' => $this->pessoal_information_to_test['bank'], 'agency' => $this->pessoal_information_to_test['agency'],
-            'number_account' => $this->pessoal_information_to_test['number_account'], 'balance' => 0.0]);
+            'bank' => $user_to_created['bank'], 'agency' => $user_to_created['agency'],
+            'number_account' => $user_to_created['number_account'], 'balance' => 0.0]);
         return $response;
     }
 
-    public function login_user_with_valid_data()
+    public function login_user_with_valid_data(array $user_to_login)
     {
         $response = $this->postJson('api/auth/login', [
-            'name' => $this->pessoal_information_to_test['name'],
-            'email' => $this->pessoal_information_to_test['email'],
-            'password' => $this->pessoal_information_to_test['password'],
-            'confirm_password' => $this->pessoal_information_to_test['confirm_password'],
+            'name' => $this->user_to_login['name'],
+            'email' => $this->user_to_login['email'],
+            'password' => $this->user_to_login['password'],
+            'confirm_password' => $this->user_to_login['confirm_password'],
         ]);
         $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
 
-        $this->accesToken = $response['access_token'];
-        return $response;
+        return $response['access_token'];
     }
 
-    public function get_user_me()
+    public function get_user_me($accesToken)
     {
-        $response = $this->get('api/auth/me', [], ['Authorization' => $this->accesToken]);
+        $response = $this->get('api/auth/me', [], ['Authorization' => $accesToken]);
         $response->assertStatus(200)->assertJsonStructure(['id', 'name', 'email', 'created_at', 'updated_at']);
         return $response;
     }
@@ -156,10 +155,10 @@ class AuthControllerTest extends TestCase
      */
     public function test_auth_controller()
     {
-        $registerResponse = $this->register_user_with_valid_datas();
-        // $loginResponse = $this->login_user_with_valid_data();
-        // $getMeResponse = $this->get_user_me();
+        $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
+        $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
+        $getMeResponse = $this->get_user_me($this->accesToken);
         // $changePasswordResponse = $this->change_password();
-        $resetPasswordResponse = $this->reset_password();
+        // $resetPasswordResponse = $this->reset_password();
     }
 }

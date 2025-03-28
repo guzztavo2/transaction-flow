@@ -84,8 +84,10 @@ class AuthService extends Service
             'confirm_new_password' => ['required', 'max:100', 'string', 'same:new_password']
         ]);
 
-        if ($token)
-            return $this->changePasswordWithToken($request, $token);
+        if (empty($token) and empty(auth('api')->user()))
+            return response()->json(['error' => 'Unauthorized access'], 401);
+
+        return $this->changePasswordWithToken($request, $token);
 
         $user = auth('api')->user();
 
@@ -100,7 +102,7 @@ class AuthService extends Service
         return $this->respondWithToken($token);
     }
 
-    private function changePasswordWithToken(Request $request, string $token = null)
+    private function changePasswordWithToken(Request $request, string $token)
     {
         $request->validate(['email' => ['required', 'max:100', 'string']]);
 

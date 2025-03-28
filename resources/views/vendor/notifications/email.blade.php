@@ -4,9 +4,9 @@
 # {{ $greeting }}
 @else
 @if ($level === 'error')
-# @lang('Whoops!')
+# @lang('Ops!')
 @else
-# @lang('Hello!')
+# @lang('Olá!')
 @endif
 @endif
 
