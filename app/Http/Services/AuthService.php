@@ -86,8 +86,8 @@ class AuthService extends Service
 
         if (empty($token) and empty(auth('api')->user()))
             return response()->json(['error' => 'Unauthorized access'], 401);
-
-        return $this->changePasswordWithToken($request, $token);
+        elseif (!empty($token))
+            return $this->changePasswordWithToken($request, $token);
 
         $user = auth('api')->user();
 
