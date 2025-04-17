@@ -51,7 +51,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function accounts()
     {
-        return $this->belongsToMany(Account::class, 'accounts_user', 'user_id', 'account_id');
+        return $this->hasMany(Account::class, 'user_id');
     }
 
     public static function new(string $name, string $email, string $password)

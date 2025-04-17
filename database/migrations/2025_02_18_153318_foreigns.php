@@ -14,6 +14,9 @@ return new class extends Migration {
             $table->foreignUuid('account_source_id')->after('id')->references('id')->on('accounts');
             $table->foreignUuid('account_destination_id')->after('account_source_id')->references('id')->on('accounts');
         });
+        Schema::table('accounts', function (Blueprint $table) {
+            $table->foreign('user_id')->references('id')->on('users');
+        });
         Schema::table('transaction_logs', function (Blueprint $table) {
             $table->foreign('transaction_id')->references('id')->on('transactions');
         });
@@ -36,6 +39,9 @@ return new class extends Migration {
         });
         Schema::table('fraud_analisys', function (Blueprint $table) {
             $table->dropForeign(['transaction_id']);
+        });
+        Schema::table('accounts', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
         });
     }
 };

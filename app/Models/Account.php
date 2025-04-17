@@ -46,7 +46,7 @@ class Account extends Model
      */
     public function user()
     {
-        return $this->belongsToMany(User::class, 'accounts_user', 'account_id', 'user_id');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 
     /**
@@ -73,10 +73,9 @@ class Account extends Model
     {
         if (gettype($user_id) == 'integer')
             $user_id = User::find($user_id);
-        $account = Account::create(['id' => Str::uuid()->toString(), 'bank' => $bank, 'agency' => $agency,
-            'number_account' => $number_account, 'balance' => $balance]);
 
-        $user_id->accounts()->attach($account->id);
+        $account = Account::create(['id' => Str::uuid()->toString(), 'bank' => $bank, 'agency' => $agency,
+            'number_account' => $number_account, 'balance' => $balance, 'user_id' => $user_id->id]);
 
         return $account;
     }

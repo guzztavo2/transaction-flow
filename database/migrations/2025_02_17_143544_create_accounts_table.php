@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
+            $table->unsignedBigInteger('user_id');
             $table->string('bank');
             $table->string('agency');
             $table->string('number_account');
