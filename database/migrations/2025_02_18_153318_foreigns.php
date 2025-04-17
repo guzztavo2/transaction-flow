@@ -10,9 +10,6 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users');
-        });
         Schema::table('transactions', function (Blueprint $table) {
             $table->foreignUuid('account_source_id')->after('id')->references('id')->on('accounts');
             $table->foreignUuid('account_destination_id')->after('account_source_id')->references('id')->on('accounts');
@@ -30,9 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-        });
         Schema::table('transactions', function (Blueprint $table) {
             $table->dropForeign(['account_source_id']);
             $table->dropForeign(['account_destination_id']);
