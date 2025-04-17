@@ -3,10 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Account extends Model
 {
+    use SoftDeletes;
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -40,7 +46,7 @@ class Account extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsToMany(User::class, 'accounts_user', 'account_id', 'user_id');
     }
 
     /**
@@ -67,16 +73,11 @@ class Account extends Model
     {
         if (gettype($user_id) == 'integer')
             $user_id = User::find($user_id);
+        $account = Account::create(['id' => Str::uuid()->toString(), 'bank' => $bank, 'agency' => $agency,
+            'number_account' => $number_account, 'balance' => $balance]);
 
-        return Account::create(
-            [
-                'id' => str::uuid()->toString(),
-                'user_id' => $user_id->id,
-                'bank' => $bank,
-                'agency' => $agency,
-                'number_account' => $number_account,
-                'balance' => $balance
-            ]
-        );
+        $user_id->accounts()->attach($account->id);
+
+        return $account;
     }
 }
