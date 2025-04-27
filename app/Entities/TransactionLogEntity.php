@@ -22,7 +22,7 @@ class TransactionLogEntity implements Entity
 
     private function setId(int $id)
     {
-        if ($transactionLog = TransactionLog::find($this->getId())) {
+        if ($transactionLog = TransactionLog::find($id)) {
             $this->id = $id;
             $this->setTransaction($transactionLog);
         }
@@ -61,4 +61,6 @@ class TransactionLogEntity implements Entity
             ]);
         }
     }
+
+    public static function create() {}
 }

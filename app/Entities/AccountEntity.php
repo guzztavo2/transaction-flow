@@ -36,16 +36,9 @@ class AccountEntity implements Entity
             $this->user = $user;
     }
 
-    public static function create(string $bank, string $agency, string $number_account, float $balance, int|User $user): self
+    public static function create(string $bank, string $agency, string $number_account, float $balance, int|User $user)
     {
-        return new self(
-            null,
-            $bank,
-            $agency,
-            $number_account,
-            $balance,
-            $user
-        );
+        (new self(null, $bank, $agency, $number_account, $balance, $user))->save();
     }
 
     public function toEntity(Account $account): self

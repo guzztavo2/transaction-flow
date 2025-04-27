@@ -24,13 +24,9 @@ class FraudAnalisysEntity implements Entity
         $this->reason = $reason;
     }
 
-    public static function create(int $status, string $reason): self
+    public static function create(int $status, string $reason)
     {
-        return new self(
-            null,
-            $status,
-            $reason
-        );
+        return (new self(null, $status, $reason))->save();
     }
 
     public static function toEntity(FraudAnalisys $fraudAnalisys): self

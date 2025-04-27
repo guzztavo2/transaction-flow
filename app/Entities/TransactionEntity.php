@@ -61,14 +61,7 @@ class TransactionEntity implements Entity
 
         $this->setAccountDestination($accountDestination);
 
-        return new self(
-            null,
-            $type,
-            $value,
-            $status,
-            $this->accountSource,
-            $this->accountDestination
-        );
+        return (new self(null, $type, $value, $status, $this->accountSource, $this->accountDestination))->save();
     }
 
     public function save()
