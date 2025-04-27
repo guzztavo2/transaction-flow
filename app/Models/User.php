@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -54,26 +53,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Account::class, 'user_id');
     }
 
-    public static function new(string $name, string $email, string $password)
-    {
-        return User::create(['name' => $name, 'email' => $email, 'password' => $password]);
-    }
-
     public function getJWTIdentifier()
     {
         return $this->getKey();
-    }
-
-    public function updatePassword(string $new_password, string $actual_password)
-    {
-        if (!Hash::check($actual_password, $this->password))
-            return ['error' => 'Unauthorized access'];
-
-        if (Hash::check($new_password, $this->password))
-            return ['error' => 'You cannot use the same password.'];
-
-        $this->update(['password' => Hash::make($new_password)]);
-        return true;
     }
 
     /**

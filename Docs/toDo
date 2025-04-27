@@ -7,14 +7,15 @@
 
 1. Estrutura de Rotas da API
 
-[] AuthController - Autenticação e Usuários
-    [x] - Register - [x] tested and worked (used phpunit);
-    [x] - Login - [x] tested and worked (used phpunit);
-    [x] - ChangePassword - [x] tested and worked (used phpunit);
-    [x] - ResetPassword - [x] tested and worked (used phpunit);
-    [x] - Me - [x] tested and worked (used phpunit);
-    [x] - Logout - [x] tested and worked (used phpunit);
-    [x] - Refresh - [x] tested and worked (used phpunit);
+[x] AuthController - Autenticação e Usuários
+
+    [x] - Register - [x] tested and worked;
+    [x] - Login - [x] tested and worked;
+    [x] - ChangePassword - [x] tested and worked;
+    [x] - ResetPassword - [x] tested and worked;
+    [x] - Me - [x] tested and worked;
+    [x] - Logout - [x] tested and worked;
+    [x] - Refresh - [x] tested and worked;
 
     ROUTES:
         POST       api/auth/change-password .............AuthController@changePassword
@@ -42,6 +43,8 @@
 
         POST       api/auth/change-password/{token} .....AuthController@changePassword
             BODY => password, confirm_password, new_password, confirm_new_password, email, emailToken
+
+[x] AccountController - Contas e saldos.
 
 Contas e Saldo
 
