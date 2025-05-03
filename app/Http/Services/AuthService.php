@@ -29,7 +29,7 @@ class AuthService extends Service
         ]);
 
         $user = UserEntity::create($request['name'], $request['email'], $request['password']);
-        $account = AccountEntity::create($request['bank'], $request['agency'], $request['number_account'], 0.0, $user->getUser());
+        $account = AccountEntity::create($request['bank'], $request['agency'], $request['number_account'], 0.0, true, $user->getUser());
 
         return response()->json([
             'name' => $user->getName(),

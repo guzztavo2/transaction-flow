@@ -89,14 +89,7 @@ class UserEntity implements Entity
 
     public function updatePassword(string $new_password, string $old_password)
     {
-        if (!Hash::check($old_password, $this->password))
-            throw new UnauthorizedException('Old password is incorrect.');
-
-        if (Hash::check($new_password, $this->password))
-            throw new UnauthorizedException('You cannot use the same password.');
-
-        $this->setPassword(Hash::make($new_password));
-        return true;
+        return $this->user->updatePassword($new_password, $old_password);
     }
 
     private function setUser(User $user)
