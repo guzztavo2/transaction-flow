@@ -2,8 +2,8 @@
 
 namespace App\Http\Services;
 
-use App\Models\Account;
-use App\Models\User;
+use App\Entities\AccountEntity;
+use App\Entities\UserEntity;
 use App\Notifications\ResetPassword;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -28,16 +28,16 @@ class AuthService extends Service
             'number_account' => ['required', 'max:100', 'string']
         ]);
 
-        $user = User::new($request['name'], $request['email'], $request['password']);
-        $account = Account::new($user, $request['bank'], $request['agency'], $request['number_account'], 0.0);
+        $user = UserEntity::create($request['name'], $request['email'], $request['password']);
+        $account = AccountEntity::create($request['bank'], $request['agency'], $request['number_account'], 0.0, $user->getUser());
 
         return response()->json([
-            'name' => $user->name,
-            'email' => $user->email,
-            'bank' => $account->bank,
-            'agency' => $account->agency,
-            'number_account' => $account->number_account,
-            'balance' => $account->balance,
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
+            'bank' => $account->getBank(),
+            'agency' => $account->getAgency(),
+            'number_account' => $account->getNumberAccount(),
+            'balance' => $account->getBalance()
         ], 200);
     }
 
@@ -60,8 +60,7 @@ class AuthService extends Service
     public function me()
     {
         $user = auth('api')->user();
-        $user->notify(new ResetPassword());
-        return response()->json($user->toArray());
+        return response()->json((array_filter($user->toArray(), fn($key) => $key != 'id', ARRAY_FILTER_USE_KEY)), 200);
     }
 
     public function logout()
