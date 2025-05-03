@@ -2,9 +2,12 @@
 
 namespace App\Entities;
 
+use App\Models\Account;
+use App\Models\User;
+
 class AccountEntity implements Entity
 {
-    private ?int $id;
+    private ?string $id;
     private string $bank;
     private string $agency;
     private string $number_account;
@@ -13,7 +16,7 @@ class AccountEntity implements Entity
     private ?Account $account;
 
     public function __construct(
-        ?int $id,
+        ?string $id,
         string $bank,
         string $agency,
         string $number_account,
@@ -28,6 +31,56 @@ class AccountEntity implements Entity
         $this->setUser($user);
     }
 
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function setBank(string $bank)
+    {
+        $this->bank = $bank;
+    }
+
+    public function setAgency(string $agency)
+    {
+        $this->agency = $agency;
+    }
+
+    public function setNumberAccount(string $number_account)
+    {
+        $this->number_account = $number_account;
+    }
+
+    public function setBalance(string $balance)
+    {
+        $this->balance = $balance;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getBank()
+    {
+        return $this->bank;
+    }
+
+    public function getAgency()
+    {
+        return $this->agency;
+    }
+
+    public function getNumberAccount()
+    {
+        return $this->number_account;
+    }
+
+    public function getBalance()
+    {
+        return $this->balance;
+    }
+
     public function setUser(int|User $user)
     {
         if (is_int($user))
@@ -38,7 +91,9 @@ class AccountEntity implements Entity
 
     public static function create(string $bank, string $agency, string $number_account, float $balance, int|User $user)
     {
-        (new self(null, $bank, $agency, $number_account, $balance, $user))->save();
+        $account = new self(null, $bank, $agency, $number_account, $balance, $user);
+        $account->save();
+        return $account;
     }
 
     public function toEntity(Account $account): self
@@ -68,13 +123,17 @@ class AccountEntity implements Entity
                 'user_id' => $this->user->id,
             ]);
         } else
-            Account::create([
+            $account = Account::create([
+                'id' => \Str::uuid()->toString(),
                 'bank' => $this->bank,
                 'agency' => $this->agency,
                 'number_account' => $this->number_account,
                 'balance' => $this->balance,
                 'user_id' => $this->user->id,
             ]);
+
+        $this->id = $account->id;
+        $this->account = $account;
     }
 
     public function toArray()
