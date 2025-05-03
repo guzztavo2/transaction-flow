@@ -12,6 +12,7 @@ class AccountEntity implements Entity
     private string $agency;
     private string $number_account;
     private float $balance;
+    private bool $is_default = false;
     private User $user;
     private ?Account $account;
 
@@ -21,17 +22,19 @@ class AccountEntity implements Entity
         string $agency,
         string $number_account,
         float $balance,
+        bool $is_default = false,
         User|int $user
     ) {
-        $this->id = $id;
-        $this->bank = $bank;
-        $this->agency = $agency;
-        $this->number_account = $number_account;
-        $this->balance = $balance;
+        $this->setId($id);
+        $this->setBank($bank);
+        $this->setAgency($agency);
+        $this->setNumberAccount($number_account);
+        $this->setBalance($balance);
+        $this->setIsDeault($is_default);
         $this->setUser($user);
     }
 
-    public function setId(string $id)
+    public function setId(?string $id)
     {
         $this->id = $id;
     }
@@ -54,6 +57,13 @@ class AccountEntity implements Entity
     public function setBalance(string $balance)
     {
         $this->balance = $balance;
+    }
+
+    public function setIsDeault(?bool $is_default)
+    {
+        $boolval = boolval($is_default);
+        if ($boolval)
+            $this->is_default = $boolval;
     }
 
     public function getId()
@@ -81,6 +91,11 @@ class AccountEntity implements Entity
         return $this->balance;
     }
 
+    public function getIsDeault()
+    {
+        return $this->is_default;
+    }
+
     public function setUser(int|User $user)
     {
         if (is_int($user))
@@ -89,9 +104,9 @@ class AccountEntity implements Entity
             $this->user = $user;
     }
 
-    public static function create(string $bank, string $agency, string $number_account, float $balance, int|User $user)
+    public static function create(string $bank, string $agency, string $number_account, float $balance, bool $is_default, int|User $user)
     {
-        $account = new self(null, $bank, $agency, $number_account, $balance, $user);
+        $account = new self(null, $bank, $agency, $number_account, $balance, $is_default, $user);
         $account->save();
         return $account;
     }
@@ -104,7 +119,8 @@ class AccountEntity implements Entity
             $account->agency,
             $account->number_account,
             $account->balance,
-            $account->user_id
+            $account->user_id,
+            $account->is_default
         );
     }
 

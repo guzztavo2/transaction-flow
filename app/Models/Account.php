@@ -19,12 +19,8 @@ class Account extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'id',
-        'bank',
-        'agency',
-        'number_account',
-        'balance',
-        'user_id'
+        'id', 'bank', 'agency', 'number_account',
+        'is_default', 'balance', 'user_id'
     ];
 
     /**
@@ -35,7 +31,7 @@ class Account extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime'
+            'created_at' => 'datetime:d-m-Y H:i:s'
         ];
     }
 
