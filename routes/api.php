@@ -20,7 +20,6 @@ Route::middleware('api')->group(function () {
 
     Route::prefix('accounts')->group(function () {
         Route::get('/accounts', 'AccountController@getAccounts');
-        Route::post('/account', 'AccountController@accounts');
-        Route::get('/account/{id}', 'AccountController@accounts');
+        Route::get('/account/{id}', 'AccountController@account');
     });
 });

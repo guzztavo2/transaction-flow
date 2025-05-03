@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Exceptions\UnauthorizedException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -66,5 +68,17 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function updatePassword(string $new_password, string $old_password)
+    {
+        if (!Hash::check($old_password, $this->password))
+            throw new UnauthorizedException('Old password is incorrect.');
+
+        if (Hash::check($new_password, $this->password))
+            throw new UnauthorizedException('You cannot use the same password.');
+
+        $this->update(['password' => Hash::make($new_password)]);
+        return true;
     }
 }

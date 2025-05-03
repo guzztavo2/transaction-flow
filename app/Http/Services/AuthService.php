@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Entities\AccountEntity;
 use App\Entities\UserEntity;
+use App\Models\User;
 use App\Notifications\ResetPassword;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
