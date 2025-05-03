@@ -42,8 +42,8 @@ class User extends Authenticatable implements JWTSubject
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
+            'created_at' => 'datetime:d/m/Y H:i:s',
+            'updated_at' => 'datetime:d/m/Y H:i:s',
             'password' => 'hashed',
         ];
     }
