@@ -7,10 +7,9 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    private AuthService $service;
-
-    public function __construct(AuthService $service)
-    {
+    public function __construct(
+        private AuthService $service
+    ) {
         $this->service = $service;
     }
 

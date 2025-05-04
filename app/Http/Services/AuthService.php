@@ -14,8 +14,8 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthService extends Service
 {
-    private const TOKEN_MAX_SECONDS = 7200;  // 2 HOURS
-    private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;  // 2 HOURS
+    private const TOKEN_MAX_SECONDS = 7200;  // 7200 Sec = 2 HOURS
+    private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;
 
     public function register(Request $request)
     {
