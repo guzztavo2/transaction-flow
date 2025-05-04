@@ -7,7 +7,7 @@ use App\Models\User;
 
 class AccountEntity implements Entity
 {
-    private ?string $id;
+    private ?string $id = null;
     private string $bank;
     private string $agency;
     private string $number_account;
@@ -36,7 +36,11 @@ class AccountEntity implements Entity
 
     public function setId(?string $id)
     {
+        if (empty($id) or !$account = $this->findById($id))
+            return;
+
         $this->id = $id;
+        $this->account = $account;
     }
 
     public function setBank(string $bank)
@@ -96,6 +100,16 @@ class AccountEntity implements Entity
         return $this->is_default;
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
     public function setUser(int|User $user)
     {
         if (is_int($user))
@@ -104,7 +118,9 @@ class AccountEntity implements Entity
             $this->user = $user;
     }
 
-    public static function create(string $bank, string $agency, string $number_account, float $balance, bool $is_default, int|User $user)
+    public static function create(string $bank,
+        string $agency, string $number_account,
+        float $balance, bool $is_default, int|User $user)
     {
         $account = new self(null, $bank, $agency, $number_account, $balance, $is_default, $user);
         $account->save();
