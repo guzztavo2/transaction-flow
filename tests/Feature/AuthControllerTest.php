@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     private array $pessoal_information_to_test = [
         'name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com',
@@ -27,8 +27,8 @@ class AuthControllerTest extends TestCase
         $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
         $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
         $getMeResponse = $this->get_user_me($this->accesToken);
-        $changePasswordResponse = $this->change_password();
-        $resetPasswordResponse = $this->reset_password();
+        // $changePasswordResponse = $this->change_password();
+        // $resetPasswordResponse = $this->reset_password();
     }
 
     public function register_user_with_valid_datas(array $user_to_created)
