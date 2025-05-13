@@ -152,6 +152,7 @@ class AccountEntity implements Entity
                 'agency' => $this->agency,
                 'number_account' => $this->number_account,
                 'balance' => $this->balance,
+                'is_default' => $this->is_default,
                 'user_id' => $this->user->id,
             ]);
         } else
@@ -162,6 +163,7 @@ class AccountEntity implements Entity
                 'number_account' => $this->number_account,
                 'balance' => $this->balance,
                 'user_id' => $this->user->id,
+                'is_default' => $this->is_default
             ]);
 
         $this->id = $account->id;
@@ -176,6 +178,7 @@ class AccountEntity implements Entity
             'agency' => $this->agency,
             'number_account' => $this->number_account,
             'balance' => $this->balance,
+            'is_default' => $this->is_default,
             'user_id' => $this->user->id
         ];
     }

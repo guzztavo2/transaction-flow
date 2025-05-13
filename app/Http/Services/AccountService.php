@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Entities\AccountEntity;
 use App\Models\Account;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,7 @@ class AccountService extends Service
         $account = AccountEntity::create($request['bank'],
             $request['agency'], $request['number_account'],
             0, $request['is_default'], $this->user);
+        return response()->json($account, 200);
     }
 
     public function update(Request $request, string $id)
@@ -61,11 +63,29 @@ class AccountService extends Service
 
         $account = $this->accountByUser()->where('id', $id)->firstOrFail();
 
-        $account->update(array_filter([
+        $updated_fields = array_filter([
             'bank' => $request['bank'],
             'agency' => $request['agency'],
             'number_account' => $request['number_account']
-        ], fn($el) => !is_null($el)));
+        ], fn($el) => !is_null($el));
+
+        if ($updatedAccount = $this->accountByUser()->where(function ($b) use ($updated_fields) {
+            if ($updated_fields['bank'])
+                $b->where('bank', $updated_fields['bank']);
+            if ($updated_fields['agency'])
+                $b->where('agency', $updated_fields['agency']);
+            if ($updated_fields['number_account'])
+                $b->where('number_account', $updated_fields['number_account']);
+        })->first())
+            if ($updatedAccount)
+                if ($updatedAccount->bank == $updated_fields['bank'] &&
+                    $updatedAccount->agency == $updated_fields['agency'] &&
+                    $updatedAccount->number_account == $updated_fields['number_account'])
+                    return response()->json([
+                        'error' => true, 'message' => "Updated field already exists in account id: $updatedAccount->id"
+                    ]);
+
+        $account->update($updated_fields);
 
         return response()->json($account->toArray(), 200);
     }

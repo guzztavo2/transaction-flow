@@ -19,7 +19,7 @@ Route::middleware('api')->group(function () {
     });
 
     Route::prefix('accounts')->group(function () {
-        Route::get('/accounts', 'AccountController@getAccounts');
-        Route::get('/account/{id}', 'AccountController@account');
+        Route::get('/', 'App\Http\Controllers\AccountController@accounts');
+        Route::get('/{id}', 'App\Http\Controllers\AccountController@account');
     });
 });
