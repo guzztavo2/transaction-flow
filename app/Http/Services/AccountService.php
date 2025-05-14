@@ -49,6 +49,10 @@ class AccountService extends Service
             'agency' => ['required', 'max:100', 'string'],
             'number_account' => ['required', 'max:100', 'string']]);
 
+        $accountToBeCreated = array_filter($updated_fields, fn($el) => !empty($el));
+        if (self::checkAccountExists($accountToBeCreated))
+            return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
+
         $account = AccountEntity::create($request['bank'],
             $request['agency'], $request['number_account'],
             0, $request['is_default'], $this->user);
@@ -68,22 +72,8 @@ class AccountService extends Service
             'agency' => $request['agency'],
             'number_account' => $request['number_account']
         ], fn($el) => !is_null($el));
-
-        if ($updatedAccount = $this->accountByUser()->where(function ($b) use ($updated_fields) {
-            if ($updated_fields['bank'])
-                $b->where('bank', $updated_fields['bank']);
-            if ($updated_fields['agency'])
-                $b->where('agency', $updated_fields['agency']);
-            if ($updated_fields['number_account'])
-                $b->where('number_account', $updated_fields['number_account']);
-        })->first())
-            if ($updatedAccount)
-                if ($updatedAccount->bank == $updated_fields['bank'] &&
-                    $updatedAccount->agency == $updated_fields['agency'] &&
-                    $updatedAccount->number_account == $updated_fields['number_account'])
-                    return response()->json([
-                        'error' => true, 'message' => "Updated field already exists in account id: $updatedAccount->id"
-                    ]);
+        if (self::checkAccountExists($updated_fields))
+            return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
 
         $account->update($updated_fields);
 
@@ -104,5 +94,30 @@ class AccountService extends Service
         $this->accountByUser()->where('is_default', true)->update(['is_default' => false]);
         $account->update(['is_default' => true]);
         return response()->json($account->toArray(), 200);
+    }
+
+    private static function checkAccountExists(array $account_fields)
+    {
+        $accounts = AccountEntity::query();
+        if ($accountExisted = $accounts->where(function ($b) use ($account_fields) {
+            if ($account_fields['bank'])
+                $b->where('bank', $account_fields['bank']);
+            if ($account_fields['agency'])
+                $b->where('agency', $account_fields['agency']);
+            if ($account_fields['number_account'])
+                $b->where('number_account', $account_fields['number_account']);
+        })->first())
+            if ($accountExisted->bank == $account_fields['bank'] &&
+                $accountExisted->agency == $account_fields['agency'] &&
+                $accountExisted->number_account == $account_fields['number_account'])
+                return true;
+        return false;
+    }
+
+    private static function filterColumnsAccount($fieldsToBeUpdated)
+    {
+        $accountFields = AccountEntity::columnKeys();
+        return array_filter($fieldsToBeUpdated, fn($val, $key) =>
+            in_array($key, $accountFields) && !empty($val), ARRAY_USE_BOTH);
     }
 }
