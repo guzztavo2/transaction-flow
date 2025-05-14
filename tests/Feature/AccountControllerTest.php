@@ -19,6 +19,11 @@ class AccountControllerTest extends TestCase
     ];
 
     private array $accounts = [];
+
+    private array $account_to_create = [
+        'bank' => 'Banco Teste', 'agency' => '001', 'number_account' => '123456'
+    ];
+
     private string $access_token;
 
     #[Test]
