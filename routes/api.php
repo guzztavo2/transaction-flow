@@ -21,5 +21,9 @@ Route::middleware('api')->group(function () {
     Route::prefix('accounts')->group(function () {
         Route::get('/', 'App\Http\Controllers\AccountController@accounts');
         Route::get('/{id}', 'App\Http\Controllers\AccountController@account');
+        Route::post('/', 'App\Http\Controllers\AccountController@create');
+        Route::put('/{id}', 'App\Http\Controllers\AccountController@update');
+        Route::delete('/{id}', 'App\Http\Controllers\AccountController@delete');
+        Route::post('/set-default/{id}', 'App\Http\Controllers\AccountController@defineDefaultAccount');
     });
 });
