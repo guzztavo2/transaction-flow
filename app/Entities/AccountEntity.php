@@ -196,4 +196,16 @@ class AccountEntity implements Entity
     {
         return Account::query();
     }
+
+    public static function columnKeys(): array
+    {
+        return [
+            'id',
+            'bank',
+            'agency',
+            'number_account',
+            'balance',
+            'is_default'
+        ];
+    }
 }
