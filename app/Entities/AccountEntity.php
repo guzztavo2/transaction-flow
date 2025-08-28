@@ -120,7 +120,7 @@ class AccountEntity implements Entity
 
     public static function create(string $bank,
         string $agency, string $number_account,
-        float $balance, bool $is_default, int|User $user)
+        float $balance, bool $is_default = false, int|User $user)
     {
         $account = new self(null, $bank, $agency, $number_account, $balance, $is_default, $user);
         $account->save();
