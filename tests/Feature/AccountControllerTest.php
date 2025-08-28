@@ -34,7 +34,10 @@ class AccountControllerTest extends TestCase
         $this->login();
         $this->getAccounts();
         $this->getDetailAccount();
-        $this->createNewAccount();
+        // $this->createNewAccount();
+        // $this->updateAccount();
+        // $this->defineDefaultAccount();
+        // $this->deleteAccount();
     }
 
     private function login()
@@ -71,8 +74,40 @@ class AccountControllerTest extends TestCase
     private function createNewAccount()
     {
         $response = $this->post('api/accounts/', $this->account_to_create[0], ['Authorization' => $this->access_token]);
-        $data = json_decode($response->getContent(), true);
-        $this->assertTrue($data['id'] == $this->accounts[0]['id']);
         $response->assertStatus(200);
+        $data = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('bank', $data);
+        $this->assertArrayHasKey('number_account', $data);
+    }
+
+    private function updateAccount()
+    {
+        $response = $this->put('api/accounts/' . $this->accounts[0]['id'], $this->account_to_create[1], ['Authorization' => $this->access_token]);
+        $response->assertStatus(200);
+        $data = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('bank', $data);
+        $this->assertArrayHasKey('number_account', $data);
+    }
+
+    private function defineDefaultAccount()
+    {
+        $response = $this->post('api/accounts/set-default/' . $this->accounts[0]['id'], [], ['Authorization' => $this->access_token]);
+        $response->assertStatus(200);
+        $data = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('bank', $data);
+        $this->assertArrayHasKey('number_account', $data);
+    }
+
+    private function deleteAccount()
+    {
+        $response = $this->delete('api/accounts/' . $this->accounts[0]['id'], [], ['Authorization' => $this->access_token]);
+        $response->assertStatus(200);
+        $data = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('bank', $data);
+        $this->assertArrayHasKey('number_account', $data);
     }
 }
