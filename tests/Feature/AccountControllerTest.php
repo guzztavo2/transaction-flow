@@ -21,7 +21,9 @@ class AccountControllerTest extends TestCase
     private array $accounts = [];
 
     private array $account_to_create = [
-        'bank' => 'Banco Teste', 'agency' => '001', 'number_account' => '123456'
+        ['bank' => 'Banco Teste 1', 'agency' => '001', 'number_account' => '123456'],
+        ['bank' => 'Banco Teste 2', 'agency' => '001', 'number_account' => '123456'],
+        ['bank' => 'Banco Teste 3', 'agency' => '001', 'number_account' => '123456'],
     ];
 
     private string $access_token;
@@ -32,6 +34,7 @@ class AccountControllerTest extends TestCase
         $this->login();
         $this->getAccounts();
         $this->getDetailAccount();
+        $this->createNewAccount();
     }
 
     private function login()
@@ -61,6 +64,15 @@ class AccountControllerTest extends TestCase
     {
         $response = $this->get('api/accounts/' . $this->accounts[0]['id'], [], ['Authorization' => $this->access_token]);
         $data = json_decode($response->getContent(), true);
+        $this->assertTrue($data['id'] == $this->accounts[0]['id']);
+        $response->assertStatus(200);
+    }
+
+    private function createNewAccount()
+    {
+        $response = $this->post('api/accounts/', $this->account_to_create[0], ['Authorization' => $this->access_token]);
+        $data = json_decode($response->getContent(), true);
+        $this->assertTrue($data['id'] == $this->accounts[0]['id']);
         $response->assertStatus(200);
     }
 }
