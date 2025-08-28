@@ -59,7 +59,7 @@ class AccountService extends Service
 
         $account = AccountEntity::create($request['bank'],
             $request['agency'], $request['number_account'],
-            0, $request['is_default'], $this->user);
+            0, $request['is_default'] ?? false, $this->user);
         return response()->json($account, 200);
     }
 
@@ -75,7 +75,7 @@ class AccountService extends Service
             'bank' => $request['bank'],
             'agency' => $request['agency'],
             'number_account' => $request['number_account']
-        ], fn($el) => !is_null($el));
+        ], fn($el) => !empty($el));
         if (self::checkAccountExists($updated_fields))
             return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
 
@@ -87,6 +87,8 @@ class AccountService extends Service
     public function delete(string $id)
     {
         $account = $this->accountByUser()->where('id', $id)->firstOrFail();
+        if ($account->is_default)
+            return response()->json(['error' => true, 'message' => 'Default account cannot be deleted!']);
         $account->delete();
         return response()->json($account->toArray(), 200);
     }
