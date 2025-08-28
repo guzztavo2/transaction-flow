@@ -49,7 +49,11 @@ class AccountService extends Service
             'agency' => ['required', 'max:100', 'string'],
             'number_account' => ['required', 'max:100', 'string']]);
 
-        $accountToBeCreated = array_filter($updated_fields, fn($el) => !empty($el));
+        $accountToBeCreated = array_filter([
+            'bank' => $request['bank'],
+            'agency' => $request['agency'],
+            'number_account' => $request['number_account']
+        ], fn($el) => !empty($el));
         if (self::checkAccountExists($accountToBeCreated))
             return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
 
