@@ -9,7 +9,7 @@ class TransactionLogEntity implements Entity
     private ?string $created_at;
     private TransactionLog $transactionLog;
 
-    public function __construct(int $id = null, string $message)
+    public function __construct(int $id = null, string $message, $created_at = null)
     {
         if (!is_null($id)) {
             $transactionLog = TransactionLog::find($id);
@@ -18,6 +18,7 @@ class TransactionLogEntity implements Entity
             }
         }
         $this->setMessage($message);
+        $this->created_at = $created_at;
     }
 
     private function setId(int $id)
@@ -60,6 +61,15 @@ class TransactionLogEntity implements Entity
                 'message' => $this->getMessage(),
             ]);
         }
+    }
+
+    public static function toEntity(TransactionLogEntity $transactionLogEntity): self
+    {
+        return new self(
+            $transactionLogEntity->id,
+            $transactionLogEntity->message,
+            $transactionLogEntity->created_at
+        );
     }
 
     public static function create() {}
