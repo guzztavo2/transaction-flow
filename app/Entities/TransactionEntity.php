@@ -22,7 +22,7 @@ class TransactionEntity implements Entity
         int $type,
         float $value,
         int $status,
-        Account|int $accountSourceId,
+        Account|int $accountSourceId = null,
         Account|int $accountDestinationId
     ) {
         $this->id = $id;
@@ -30,7 +30,9 @@ class TransactionEntity implements Entity
         $this->value = $value;
         $this->status = $status;
         $this->setAccountDestination($accountDestinationId);
-        $this->setAccountSource($accountSourceId);
+
+        if ($accountSourceId)
+            $this->setAccountSource($accountSourceId);
     }
 
     public function setAccountSource(Account|int $account)
@@ -112,14 +114,7 @@ class TransactionEntity implements Entity
 
     public static function toEntity(Transaction $transaction): self
     {
-        return new self(
-            $transaction->id,
-            $transaction->type,
-            $transaction->value,
-            $transaction->status,
-            $transaction->account_source_id,
-            $transaction->account_destination_id
-        );
+        return new self($transaction->id, $transaction->type, $transaction->value, $transaction->status, $transaction->account_source_id, $transaction->account_destination_id);
     }
 
     public static function findById(int $id): ?self

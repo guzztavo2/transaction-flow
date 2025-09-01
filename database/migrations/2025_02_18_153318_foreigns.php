@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->foreignUuid('account_source_id')->after('id')->references('id')->on('accounts');
+            $table->foreignUuid('account_source_id')->nullable()->after('id')->references('id')->on('accounts');
             $table->foreignUuid('account_destination_id')->after('account_source_id')->references('id')->on('accounts');
         });
         Schema::table('accounts', function (Blueprint $table) {
