@@ -8,15 +8,11 @@ use App\Models\FraudAnalisys;
 
 class FraudAnalisysEntity implements Entity
 {
-    private ?int $id;
-    private int $status;
-    private string $reason;
-
     public function __construct(
-        ?int $id,
-        int $transactionId,
-        int $status,
-        string $reason
+        private ?int $id,
+        private int $transactionId,
+        private int $status,
+        private string $reason
     ) {
         $this->id = $id;
         $this->transactionId = $transactionId;
@@ -59,7 +55,27 @@ class FraudAnalisysEntity implements Entity
         }
     }
 
-    public function toArray() {}
-    public static function findById(int $id): ?self {}
-    public static function query() {}
+    public function toArray()
+    {
+        return [
+            'id' => $this->id,
+            'transactionId' => $this->transactionId,
+            'status' => $this->status,
+            'reason' => $this->reason
+        ];
+    }
+
+    public static function findById(int $id): ?self
+    {
+        $fraudAnalisys = FraudAnalisys::find($id);
+        if (!$fraudAnalisys) {
+            return null;
+        }
+        return self::toEntity($fraudAnalisys);
+    }
+
+    public static function query()
+    {
+        return FraudAnalisys::query();
+    }
 }
