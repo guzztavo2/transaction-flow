@@ -13,9 +13,6 @@ use Illuminate\Validation\Rules\Password;
 
 class AccountService extends Service
 {
-    private const TOKEN_MAX_SECONDS = 7200;  // 2 HOURS
-    private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;  // 2 HOURS
-
     private User $user;
 
     public function __construct()
@@ -96,7 +93,6 @@ class AccountService extends Service
     public function defineDefaultAccount(string $id)
     {
         $account = $this->accountByUser()->where('id', $id)->firstOrFail();
-
         $this->accountByUser()->where('is_default', true)->update(['is_default' => false]);
         $account->update(['is_default' => true]);
         return response()->json($account->toArray(), 200);
@@ -118,12 +114,5 @@ class AccountService extends Service
                 $accountExisted->number_account == $account_fields['number_account'])
                 return true;
         return false;
-    }
-
-    private static function filterColumnsAccount($fieldsToBeUpdated)
-    {
-        $accountFields = AccountEntity::columnKeys();
-        return array_filter($fieldsToBeUpdated, fn($val, $key) =>
-            in_array($key, $accountFields) && !empty($val), ARRAY_USE_BOTH);
     }
 }
