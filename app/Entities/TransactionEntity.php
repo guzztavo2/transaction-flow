@@ -11,7 +11,7 @@ class TransactionEntity implements Entity
 {
     private ?int $id;
     private int $type;
-    private float $value;
+    private float $amount;
     private int $status;
     private Account $accountSource;
     private Account $accountDestination;
@@ -20,14 +20,14 @@ class TransactionEntity implements Entity
     public function __construct(
         ?int $id,
         int $type,
-        float $value,
+        float $amount,
         int $status,
         Account|int $accountSourceId = null,
         Account|int $accountDestinationId
     ) {
         $this->id = $id;
         $this->type = $type;
-        $this->value = $value;
+        $this->value = $amount;
         $this->status = $status;
         $this->setAccountDestination($accountDestinationId);
 
@@ -51,7 +51,7 @@ class TransactionEntity implements Entity
             throw new \UnauthorizedException('Account destination not found');
     }
 
-    public static function create(int|Account $accountSource, int|Account $accountDestination, int $type, float $value, int $status): self
+    public static function create(int|Account $accountSource, int|Account $accountDestination, int $type, float $amount, int $status): self
     {
         if ($type < 0 || $type > Transaction::TYPE_LOOT)
             throw new \UnauthorizedException('Transaction type not valid');
@@ -63,7 +63,7 @@ class TransactionEntity implements Entity
 
         $this->setAccountDestination($accountDestination);
 
-        return (new self(null, $type, $value, $status, $this->accountSource, $this->accountDestination))->save();
+        return (new self(null, $type, $amount, $status, $this->accountSource, $this->accountDestination))->save();
     }
 
     public function save()
