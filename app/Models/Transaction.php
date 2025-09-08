@@ -11,13 +11,13 @@ class Transaction extends Model
      *
      * @var list<string>
      */
-    public const STATUS_FAIL = 0;
+    public const STATUS_FAIL = 0,
+        STATUS_DONE = 1,
+        STATUS_PENDING = 2;
 
-    public const STATUS_DONE = 1;
-    public const STATUS_PENDING = 2;
-    public const TYPE_FAIL = 0;
-    public const TYPE_DEPOSIT = 1;
-    public const TYPE_LOOT = 2;
+    public const TYPE_FAIL = 0,
+        TYPE_DEPOSIT = 1,
+        TYPE_LOOT = 2;
 
     protected $fillable = [
         'type',
