@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -52,14 +50,14 @@ services:
     ports:
       - "6379:6379"
 
-  # queue:
-  #   build: .
-  #   container_name: laravel_queue
-  #   working_dir: /var/www
-  #   depends_on:
-  #     - redis
-  #     - app
-  #   entrypoint: [ "sh", "/var/www/docker/worker.sh" ]
+  queue:
+    build: .
+    container_name: laravel_queue
+    working_dir: /var/www
+    depends_on:
+      - redis
+      - app
+    entrypoint: [ "sh", "/var/www/docker/worker.sh" ]
 
   supervisor:
     build: .
@@ -70,3 +68,5 @@ services:
     volumes:
       - .:/var/www
     entrypoint: [ "supervisord", "-c", "/var/www/docker/supervisord.conf" ]
+    command: supervisord -c /etc/supervisor/supervisord.conf
+
