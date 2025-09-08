@@ -84,7 +84,7 @@ class AuthService extends Service
             'confirm_new_password' => ['required', 'max:100', 'string', 'same:new_password']
         ]);
 
-        if (empty($token) and empty(auth('api')->user()))
+        if (empty($token) && empty(auth('api')->user()))
             return response()->json(['error' => 'Unauthorized access'], 401);
         elseif (!empty($token))
             return $this->changePasswordWithToken($request, $token);
