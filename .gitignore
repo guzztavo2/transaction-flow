@@ -23,3 +23,7 @@ yarn-error.log
 /.zed
 xdebug.ini_
 xdebug.log
+database/data/
+supervisord.log
+supervisord.pid
+xdebug.log
