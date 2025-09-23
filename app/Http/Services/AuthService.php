@@ -5,12 +5,12 @@ namespace App\Http\Services;
 use App\Entities\AccountEntity;
 use App\Entities\UserEntity;
 use App\Models\User;
-use App\Notifications\ResetPassword;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Jobs\sendEmail;
 
 class AuthService extends Service
 {
@@ -50,7 +50,7 @@ class AuthService extends Service
         ]);
 
         $credentials = request(['email', 'password']);
-
+        $user = User::where('email', $request->email)->first();
         if (!$token = auth('api')->setTTL(self::TOKEN_MAX_SECONDS)->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -136,8 +136,8 @@ class AuthService extends Service
             'email' => ['required', 'max:100', 'string', 'exists:users,email']
         ]);
         $user = User::where('email', $request->email)->first();
-
-        $user->notify(new ResetPassword(self::RECOVERY_PASSWORD_TOKEN_HOUR));
+        
+        sendEmail::dispatch($user->id, self::RECOVERY_PASSWORD_TOKEN_HOUR);
         return response()->json('An email was sent to reset your password.', 200);
     }
 
