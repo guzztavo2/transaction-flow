@@ -2,20 +2,22 @@
 
 namespace App\Entities;
 
+use App\Models\TransactionLog;
+use App\Models\Transaction;
+
 class TransactionLogEntity implements Entity
 {
     private ?int $id;
     private string $message;
+    private int $transaction_id;
     private ?string $created_at;
     private TransactionLog $transactionLog;
+    private Transaction $transaction;
 
-    public function __construct(int $id = null, string $message, $created_at = null)
+    public function __construct(int $id = null, string $message, int|Transaction $transaction, $created_at = null)
     {
         if (!is_null($id)) {
-            $transactionLog = TransactionLog::find($id);
-            if ($transactionLog) {
-                $this->setId($id);
-            }
+            $this->setId($id);
         }
         $this->setMessage($message);
         $this->created_at = $created_at;
@@ -25,7 +27,7 @@ class TransactionLogEntity implements Entity
     {
         if ($transactionLog = TransactionLog::find($id)) {
             $this->id = $id;
-            $this->setTransaction($transactionLog);
+            $this->setTransactionLog($transactionLog);
         }
     }
 
@@ -34,11 +36,15 @@ class TransactionLogEntity implements Entity
         $this->message = $message;
     }
 
-    private function setTransaction(TransactionLog $transactionLog)
+    private function setTransactionLog(TransactionLog $transactionLog)
     {
         $this->transactionLog = $transactionLog;
     }
 
+    public function getTransaction(): Transaction
+    {
+        return $this->transaction;
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -54,23 +60,34 @@ class TransactionLogEntity implements Entity
         if (is_null($this->getId())) {
             $transactionLog = TransactionLog::create([
                 'message' => $this->getMessage(),
+                'transaction_id' => $this->transaction_id
             ]);
             $this->setId($transactionLog->id);
         } else {
             $this->transactionLog->update([
                 'message' => $this->getMessage(),
+                'transaction_id' => $this->transaction_id
             ]);
         }
     }
 
-    public static function toEntity(TransactionLogEntity $transactionLogEntity): self
+    public function toArray()
     {
-        return new self(
-            $transactionLogEntity->id,
-            $transactionLogEntity->message,
-            $transactionLogEntity->created_at
-        );
+        return [
+            'id' => $this->id,
+            'message' => $this->message,
+            'transaction_id' => $this->transaction_id,
+            'created_at' => $this->created_at
+        ];
     }
 
-    public static function create() {}
+    public static function toEntity(TransactionLogEntity $transactionLogEntity): self
+    {
+        return new self($transactionLogEntity->id, $transactionLogEntity->message, $transactionLogEntity->created_at);
+    }
+
+    public static function create(string $message, int|Transaction $transaction, $created_at = null): self
+    {
+        return (new self(null, $message, $transaction, $created_at))->save();
+    }
 }

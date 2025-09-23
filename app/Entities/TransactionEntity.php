@@ -59,10 +59,6 @@ class TransactionEntity implements Entity
         if ($status < 0 || $status > Transaction::STATUS_PENDING)
             throw new \UnauthorizedException('Transaction status not valid');
 
-        $this->setAccountSource($accountSource);
-
-        $this->setAccountDestination($accountDestination);
-
         return (new self(null, $type, $amount, $status, $this->accountSource, $this->accountDestination))->save();
     }
 
@@ -82,7 +78,7 @@ class TransactionEntity implements Entity
                 'account_source_id' => $this->accountSource->id,
                 'account_destination_id' => $this->accountDestination->id
             ]);
-
+            
             return true;
         } else {
             $this->transaction = Transaction::create([
