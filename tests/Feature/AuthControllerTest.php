@@ -51,9 +51,9 @@ class AuthControllerTest extends TestCase
 
     public function register_with_invalid_data()
     {
-        $resposta = $this->postJson('api/auth/register', []);
+        $response = $this->postJson('api/auth/register', []);
 
-        $resposta
+        $response
             ->assertStatus(422)
             ->assertJsonValidationErrors(['name', 'email', 'password', 'confirm_password', 'bank', 'agency', 'number_account']);
     }
