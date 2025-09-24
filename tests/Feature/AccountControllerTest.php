@@ -93,7 +93,7 @@ class AccountControllerTest extends TestCase
 
     private function defineDefaultAccount()
     {
-        $response = $this->post('api/accounts/set-default/' . $this->accounts[0]['id'], [], ['Authorization' => $this->access_token]);
+        $response = $this->post('api/accounts/define-dedault/' . $this->accounts[0]['id'], [], ['Authorization' => $this->access_token]);
         $response->assertStatus(200);
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('id', $data);
