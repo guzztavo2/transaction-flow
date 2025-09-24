@@ -20,7 +20,7 @@ class AccountService extends Service
         $this->user = Auth('api')->user();
     }
 
-    public function accounts()
+    public function index()
     {
         return response()->json($this
             ->accountByUser()
@@ -29,7 +29,7 @@ class AccountService extends Service
             ->toArray(), 200);
     }
 
-    public function account(string $id)
+    public function show(string $id)
     {
         $account = $this->accountByUser()->where('id', $id)->firstOrFail();
         return response()->json($account->toArray(), 200);
@@ -40,7 +40,7 @@ class AccountService extends Service
         return $this->user->accounts();
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $request->validate(['bank' => ['required', 'max:100', 'string'],
             'agency' => ['required', 'max:100', 'string'],
@@ -51,6 +51,7 @@ class AccountService extends Service
             'agency' => $request['agency'],
             'number_account' => $request['number_account']
         ], fn($el) => !empty($el));
+
         if (self::checkAccountExists($accountToBeCreated))
             return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
 
@@ -73,6 +74,7 @@ class AccountService extends Service
             'agency' => $request['agency'],
             'number_account' => $request['number_account']
         ], fn($el) => !empty($el));
+
         if (self::checkAccountExists($updated_fields))
             return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
 
@@ -90,7 +92,7 @@ class AccountService extends Service
         return response()->json($account->toArray(), 200);
     }
 
-    public function defineDefaultAccount(string $id)
+    public function defineDefault(string $id)
     {
         $account = $this->accountByUser()->where('id', $id)->firstOrFail();
         $this->accountByUser()->where('is_default', true)->update(['is_default' => false]);

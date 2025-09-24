@@ -13,19 +13,19 @@ class AccountController extends Controller
         $this->service = $service;
     }
 
-    public function accounts()
+    public function index()
     {
-        return $this->service->accounts();
+        return $this->service->index();
     }
 
-    public function account(string $id)
+    public function show(string $id)
     {
-        return $this->service->account($id);
+        return $this->service->show($id);
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
-        return $this->service->create($request);
+        return $this->service->store($request);
     }
 
     public function update(Request $request, string $id)
@@ -38,8 +38,8 @@ class AccountController extends Controller
         return $this->service->delete($id);
     }
 
-    public function defineDefaultAccount(string $id)
+    public function defineDefault(string $id)
     {
-        return $this->service->defineDefaultAccount($id);
+        return $this->service->defineDefault($id);
     }
 }
