@@ -16,9 +16,10 @@ class TransactionLogEntity implements Entity
 
     public function __construct(int $id = null, string $message, int|Transaction $transaction, $created_at = null)
     {
-        if (!is_null($id)) {
+        if (!is_null($id)) 
             $this->setId($id);
-        }
+        
+        $this->setTransaction($transaction);
         $this->setMessage($message);
         $this->created_at = $created_at;
     }
@@ -36,9 +37,28 @@ class TransactionLogEntity implements Entity
         $this->message = $message;
     }
 
-    private function setTransactionLog(TransactionLog $transactionLog)
-    {
-        $this->transactionLog = $transactionLog;
+    private function setTransactionLog(TransactionLog|int $transactionLog)
+    {   
+        if(gettype($transactionLog) == "integer")
+            $transactionLog = TransactionLog::find($transactionLog);
+        
+        if($transactionLog)
+            $this->transactionLog = $transactionLog;
+    }
+
+    private function setTransaction(Transaction|int $transaction){
+        if(gettype($transaction) == "integer")
+            $transaction = Transaction::find($transaction);
+
+        if($transaction){
+            $this->transaction = $transaction;
+            $this->transacation_id = $transaction->id;
+        }
+    }
+
+    private function getTransactionLog(): TransactionLog
+    {   
+        return $this->transactionLog;
     }
 
     public function getTransaction(): Transaction

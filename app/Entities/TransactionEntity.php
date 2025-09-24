@@ -6,6 +6,7 @@ use App\Exceptions\UnauthorizedException;
 use App\Interfaces\Entity;
 use App\Models\Account;
 use App\Models\Transaction;
+use App\Entities\TransactionLogEntity;
 
 class TransactionEntity implements Entity
 {
@@ -27,7 +28,7 @@ class TransactionEntity implements Entity
     ) {
         $this->id = $id;
         $this->type = $type;
-        $this->value = $amount;
+        $this->amount = $amount;
         $this->status = $status;
         $this->setAccountDestination($accountDestinationId);
 
@@ -70,10 +71,10 @@ class TransactionEntity implements Entity
                 $this->id = null;
                 return $this->save();
             }
-
+            TransactionLogEntity::create(null, "UPDATE TRANSACTION: STATUS: $transaction->status, AMOUNT: $transaction->amount", $transaction);
             $this->transaction->update([
                 'type' => $this->type,
-                'value' => $this->value,
+                'amount' => $this->amount,
                 'status' => $this->status,
                 'account_source_id' => $this->accountSource->id,
                 'account_destination_id' => $this->accountDestination->id
@@ -83,13 +84,14 @@ class TransactionEntity implements Entity
         } else {
             $this->transaction = Transaction::create([
                 'type' => $this->type,
-                'value' => $this->value,
+                'amount' => $this->amount,
                 'status' => $this->status,
                 'account_source_id' => $this->accountSource->id,
                 'account_destination_id' => $this->accountDestination->id
             ]);
             if ($this->transaction) {
                 $this->id = $this->transaction->id;
+                TransactionLogEntity::create(null, "CREATE TRANSACTION: STATUS: $transaction->status, AMOUNT: $transaction->amount", $transaction);
                 return true;
             }
         }
@@ -101,7 +103,7 @@ class TransactionEntity implements Entity
         return [
             'id' => $this->id,
             'type' => $this->type,
-            'value' => $this->value,
+            'amount' => $this->amount,
             'status' => $this->status,
             'account_source_id' => $this->accountSource->id,
             'account_destination_id' => $this->accountDestination->id
@@ -110,7 +112,7 @@ class TransactionEntity implements Entity
 
     public static function toEntity(Transaction $transaction): self
     {
-        return new self($transaction->id, $transaction->type, $transaction->value, $transaction->status, $transaction->account_source_id, $transaction->account_destination_id);
+        return new self($transaction->id, $transaction->type, $transaction->amount, $transaction->status, $transaction->account_source_id, $transaction->account_destination_id);
     }
 
     public static function findById(int $id): ?self
