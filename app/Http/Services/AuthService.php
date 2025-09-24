@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use App\Jobs\sendEmail;
+use App\Jobs\ResetPasswordJob;
 
 class AuthService extends Service
 {
@@ -137,7 +137,7 @@ class AuthService extends Service
         ]);
         $user = User::where('email', $request->email)->first();
         
-        sendEmail::dispatch($user->id, self::RECOVERY_PASSWORD_TOKEN_HOUR);
+        ResetPasswordJob::dispatch($user->id, self::RECOVERY_PASSWORD_TOKEN_HOUR);
         return response()->json('An email was sent to reset your password.', 200);
     }
 
