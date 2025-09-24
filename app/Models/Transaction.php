@@ -15,14 +15,14 @@ class Transaction extends Model
         STATUS_DONE = 1,
         STATUS_PENDING = 2;
 
-    public const TYPE_FAIL = 0,
-        TYPE_DEPOSIT = 1,
+    public const TYPE_DEPOSIT = 1,
         TYPE_LOOT = 2;
 
     protected $fillable = [
         'type',
         'amount',
-        'status'
+        'status',
+        'scheduled_at'
     ];
 
     /**
@@ -33,7 +33,8 @@ class Transaction extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime'
+            'created_at' => 'datetime',
+            'scheduled_at' => 'datetime'
         ];
     }
 
@@ -70,13 +71,14 @@ class Transaction extends Model
         if ($status < 0 || $status > Transaction::STATUS_PENDING)
             throw new \Exception('Transaction not good selected');
 
-        if (gettype($account_source) == 'int')
+        if (is_int($account_source))
             $account_source = Account::find($account_source);
         if (is_null($account_source))
             throw new \Exception('Account not localized');
 
-        if (gettype($account_destination) == 'int')
+        if (is_int($account_destination))
             $account_destination = Account::find($account_destination);
+        
         if (is_null($account_destination))
             throw new \Exception('Account not localized');
 

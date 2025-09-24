@@ -39,7 +39,7 @@ class TransactionLogEntity implements Entity
 
     private function setTransactionLog(TransactionLog|int $transactionLog)
     {   
-        if(gettype($transactionLog) == "integer")
+        if(is_int($transactionLog))
             $transactionLog = TransactionLog::find($transactionLog);
         
         if($transactionLog)
@@ -47,7 +47,7 @@ class TransactionLogEntity implements Entity
     }
 
     private function setTransaction(Transaction|int $transaction){
-        if(gettype($transaction) == "integer")
+        if(is_int($transaction))
             $transaction = Transaction::find($transaction);
 
         if($transaction){

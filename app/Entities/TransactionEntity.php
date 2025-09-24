@@ -7,6 +7,7 @@ use App\Interfaces\Entity;
 use App\Models\Account;
 use App\Models\Transaction;
 use App\Entities\TransactionLogEntity;
+use Illuminate\Support\Carbon;
 
 class TransactionEntity implements Entity
 {
@@ -17,12 +18,14 @@ class TransactionEntity implements Entity
     private Account $accountSource;
     private Account $accountDestination;
     private ?Transaction $transaction;
+    private ?Carbon $scheduled_at = null;
 
     public function __construct(
         ?int $id,
         int $type,
         float $amount,
         int $status,
+        ?Carbon $scheduled_at = null,
         Account|int $accountSourceId = null,
         Account|int $accountDestinationId
     ) {
@@ -30,6 +33,8 @@ class TransactionEntity implements Entity
         $this->type = $type;
         $this->amount = $amount;
         $this->status = $status;
+        $this->scheduled_at = $scheduled_at;
+
         $this->setAccountDestination($accountDestinationId);
 
         if ($accountSourceId)
@@ -71,11 +76,12 @@ class TransactionEntity implements Entity
                 $this->id = null;
                 return $this->save();
             }
-            TransactionLogEntity::create(null, "UPDATE TRANSACTION: STATUS: $transaction->status, AMOUNT: $transaction->amount", $transaction);
+            TransactionLogEntity::create(null, "UPDATE TRANSACTION - STATUS: $transaction->status, AMOUNT: $transaction->amount", $transaction);
             $this->transaction->update([
                 'type' => $this->type,
                 'amount' => $this->amount,
                 'status' => $this->status,
+                'scheduled_at' => $this->scheduled_at,
                 'account_source_id' => $this->accountSource->id,
                 'account_destination_id' => $this->accountDestination->id
             ]);
@@ -86,6 +92,7 @@ class TransactionEntity implements Entity
                 'type' => $this->type,
                 'amount' => $this->amount,
                 'status' => $this->status,
+                'scheduled_at' => $this->scheduled_at,
                 'account_source_id' => $this->accountSource->id,
                 'account_destination_id' => $this->accountDestination->id
             ]);
@@ -105,6 +112,7 @@ class TransactionEntity implements Entity
             'type' => $this->type,
             'amount' => $this->amount,
             'status' => $this->status,
+            'scheduled_at' => $this->scheduled_at,
             'account_source_id' => $this->accountSource->id,
             'account_destination_id' => $this->accountDestination->id
         ];

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Transaction;
 
 return new class extends Migration {
     /**
@@ -12,9 +13,10 @@ return new class extends Migration {
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('type');
+            $table->tinyInteger('type');
             $table->decimal('amount', 8, 2);
-            $table->unsignedInteger('status');
+            $table->tinyInteger('status')->default(Transaction::STATUS_PENDING);
+            $table->timestamp('scheduled_at')->nullable(); 
             $table->timestamps();
             $table->index(['id']);
         });
