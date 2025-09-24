@@ -14,5 +14,9 @@ use App\Jobs\ResetPasswordJob;
 
 class TransactionService extends Service
 {
-    
+    public function store(Request $request)
+    {
+        
+    }
+
 }

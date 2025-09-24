@@ -26,4 +26,10 @@ Route::middleware('api')->group(function () {
         Route::delete('/{id}', 'App\Http\Controllers\AccountController@delete');
         Route::post('/define-dedault/{id}', 'App\Http\Controllers\AccountController@defineDefault');
     });
+
+    Route::prefix('transactions')->group(function () {
+        Route::get('/', 'App\Http\Controllers\TransactionController@index');
+        Route::get('/{id}', 'App\Http\Controllers\TransactionController@show');
+        Route::post('/', 'App\Http\Controllers\TransactionController@store');
+    });
 });
