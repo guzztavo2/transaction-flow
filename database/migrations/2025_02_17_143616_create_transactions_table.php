@@ -12,10 +12,8 @@ return new class extends Migration {
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            // $table->uuid('account_source_id');
-            // $table->uuid('account_destination_id');
             $table->unsignedInteger('type');
-            $table->decimal('amount');
+            $table->decimal('amount', 8, 2);
             $table->unsignedInteger('status');
             $table->timestamps();
             $table->index(['id']);
