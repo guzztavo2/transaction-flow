@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\User;
 
-class sendEmail implements ShouldQueue
+class ResetPasswordJob implements ShouldQueue
 {
     use Queueable;
 
