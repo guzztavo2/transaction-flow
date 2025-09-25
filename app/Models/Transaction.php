@@ -92,4 +92,15 @@ class Transaction extends Model
             ]
         );
     }
+
+    public function get_status(){
+        $status = [ self::STATUS_FAIL => 'FAIL', self::STATUS_DONE => 'DONE', self::STATUS_PENDING => 'PENDING' ];
+        return $status[$this->status];
+    }
+
+    public function get_type(){
+        $type = [self::TYPE_TRANSFER => 'TRANSFER', self::TYPE_DEPOSIT => 'DEPOSIT', self::TYPE_LOOT => 'LOOT'];
+        return $type[$this->type];
+    }
+    
 }
