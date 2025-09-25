@@ -10,31 +10,24 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql gd mbstring intl
 
 RUN apt-get update && apt-get install -y supervisor
-
+RUN docker-php-ext-install bcmath
 RUN pecl install xdebug && docker-php-ext-enable xdebug 
 #\
  #&& pecl install redis && docker-php-ext-enable redis
 
 COPY ./php/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-# COPY ./xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 RUN apt-get update && apt-get install -y nano
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Define o diretório de trabalho
 WORKDIR /var/www
 
-# Copia os arquivos do projeto
 COPY . .
 
-# Instala dependências do Laravel
 RUN composer install && php artisan key:generate
 
-# Expondo a porta do Laravel
 EXPOSE 8000
 
-# Comando padrão do container
 CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
