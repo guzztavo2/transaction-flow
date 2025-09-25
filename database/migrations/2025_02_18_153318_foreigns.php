@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::table('transactions', function (Blueprint $table) {
             $table->foreignUuid('account_source_id')->nullable()->after('id')->references('id')->on('accounts');
-            $table->foreignUuid('account_destination_id')->after('account_source_id')->references('id')->on('accounts');
+            $table->foreignUuid('account_destination_id')->nullable()->after('account_source_id')->references('id')->on('accounts');
         });
         Schema::table('accounts', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users');
