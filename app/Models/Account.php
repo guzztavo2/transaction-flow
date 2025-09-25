@@ -67,7 +67,7 @@ class Account extends Model
 
     public static function new(int|User $user_id, string $bank, string $agency, string $number_account, float $balance)
     {
-        if (gettype($user_id) == 'integer')
+        if (is_int($user_id))
             $user_id = User::find($user_id);
 
         $account = Account::create(['id' => Str::uuid()->toString(), 'bank' => $bank, 'agency' => $agency,
