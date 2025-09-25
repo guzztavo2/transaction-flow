@@ -15,7 +15,7 @@ class Transaction extends Model
         STATUS_DONE = 1,
         STATUS_PENDING = 2;
 
-    public const TYPE_DEPOSIT = 1,
+    public const TYPE_TRANSFER = 0, TYPE_DEPOSIT = 1,
         TYPE_LOOT = 2;
 
     protected $fillable = [
