@@ -35,7 +35,7 @@ class AccountService extends Service
         return response()->json($account->toArray(), 200);
     }
 
-    private function accountByUser()
+    public function accountByUser()
     {
         return $this->user->accounts();
     }
