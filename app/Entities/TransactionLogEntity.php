@@ -7,7 +7,7 @@ use App\Models\Transaction;
 
 class TransactionLogEntity implements Entity
 {
-    private ?int $id;
+    private ?int $id = null;
     private string $message;
     private int $transaction_id;
     private ?string $created_at;
@@ -52,7 +52,7 @@ class TransactionLogEntity implements Entity
 
         if($transaction){
             $this->transaction = $transaction;
-            $this->transacation_id = $transaction->id;
+            $this->transaction_id = $transaction->id;
         }
     }
 
@@ -108,6 +108,22 @@ class TransactionLogEntity implements Entity
 
     public static function create(string $message, int|Transaction $transaction, $created_at = null): self
     {
-        return (new self(null, $message, $transaction, $created_at))->save();
+        $log = new self(null, $message, $transaction, $created_at);
+        $log->save();
+        return $log;    
+    }
+
+    public static function findById(int $id): ?self
+    {
+        $transaction = TransactionLog::find($id);
+        if ($transaction)
+            return self::toEntity($transaction);
+
+        return null;
+    }
+
+    public static function query()
+    {
+        return TransactionLog::query();
     }
 }
