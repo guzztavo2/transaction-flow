@@ -75,4 +75,18 @@ class Account extends Model
 
         return $account;
     }
+
+    public function incrementBalance(string $amount){
+        bcscale(2);
+        $this->balance = bcadd($this->balance, $amount);
+        $this->save();
+        return $this;
+    }
+    
+    public function decrementBalance(string $amout){
+        bcscale(2);
+        $this->balance = bcsub($this->balance, $amount);
+        $this->save();
+        return $this;
+    }
 }
