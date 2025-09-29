@@ -51,7 +51,7 @@ class CreateFeatureTest extends Command
             use Illuminate\Support\Facades\Hash;
             use Tests\TestCase;
             
-            class {$test}
+            class {$test} extends TestCase
             {
             // use RefreshDatabase;
                 #[Test]
