@@ -12,7 +12,8 @@ class TransactionLog extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'message'
+        'message',
+        'transaction_id'
     ];
 
     /**
