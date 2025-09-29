@@ -3,69 +3,107 @@
 namespace App\Entities;
 
 use App\Exceptions\UnauthorizedException;
-use App\Interfaces\Entity;
+use App\Entities\Entity;
 use App\Models\Account;
 use App\Models\Transaction;
 use App\Entities\TransactionLogEntity;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class TransactionEntity implements Entity
 {
     private ?int $id;
     private int $type;
-    private float $amount;
+    private string $amount;
     private int $status;
-    private Account $accountSource;
-    private Account $accountDestination;
+    private ?Account $accountSource = null;
+    private ?Account $accountDestination = null;
     private ?Transaction $transaction;
     private ?Carbon $scheduled_at = null;
 
     public function __construct(
         ?int $id,
         int $type,
-        float $amount,
+        string $amount,
         int $status,
         ?Carbon $scheduled_at = null,
-        Account|int $accountSourceId = null,
-        Account|int $accountDestinationId
+        Account|string $accountSourceId = null,
+        Account|string $accountDestinationId = null
     ) {
         $this->id = $id;
-        $this->type = $type;
         $this->amount = $amount;
-        $this->status = $status;
+        $this->set_status($status);
+        $this->set_type($type);
         $this->scheduled_at = $scheduled_at;
 
-        $this->setAccountDestination($accountDestinationId);
+        if ($accountDestinationId)
+            $this->setAccountDestination($accountDestinationId);
 
         if ($accountSourceId)
             $this->setAccountSource($accountSourceId);
     }
 
-    public function setAccountSource(Account|int $account)
+    public function get_id(): ?int
     {
-        if (is_int($account))
+        return $this->id ?? null;
+    }
+
+    public function get_transaction(): Transaction
+    {
+        return $this->transaction;
+    }
+
+    public function set_status(int $status){
+        if ($status < 0 || $status > Transaction::STATUS_PENDING)
+            throw new \UnauthorizedException('Transaction status not valid');
+
+        $this->status = $status;
+    }
+
+    public function set_type(int $type){
+        if ($type < 0 || $type > Transaction::TYPE_LOOT)
+            throw new \UnauthorizedException('Transaction type not valid');
+
+        $this->type = $type;
+    }
+
+    public function get_status(): int
+    {
+        return $this->status;
+    }
+
+    public function get_type(): int
+    {
+        return $this->type;
+    }
+
+    public function setAccountSource(Account|string $account)
+    {
+        if (is_string($account))
             $this->accountSource = Account::find($account);
+        else    
+            $this->accountSource = $account;
+        
         if (is_null($this->accountSource))
             throw new \UnauthorizedException('Account source not found');
     }
 
-    public function setAccountDestination(Account|int $account)
+    public function setAccountDestination(Account|string $account)
     {
-        if (is_int($account))
-            $this->accountSource = Account::find($account);
-        if (is_null($this->accountSource))
+        if (is_string($account))
+            $this->accountDestination = Account::find($account);
+        else
+            $this->accountDestination = $account;
+
+        if (is_null($this->accountDestination))
             throw new \UnauthorizedException('Account destination not found');
     }
 
-    public static function create(int|Account $accountSource, int|Account $accountDestination, int $type, float $amount, int $status): self
+    public static function create(int|Account $accountSource = null, int|Account $accountDestination = null, int $type, string $amount, int $status, Carbon $scheduled_at = null): self
     {
-        if ($type < 0 || $type > Transaction::TYPE_LOOT)
-            throw new \UnauthorizedException('Transaction type not valid');
-
-        if ($status < 0 || $status > Transaction::STATUS_PENDING)
-            throw new \UnauthorizedException('Transaction status not valid');
-
-        return (new self(null, $type, $amount, $status, $this->accountSource, $this->accountDestination))->save();
+        $transaction = (new self(null, $type, $amount, $status, $scheduled_at ,$accountSource, $accountDestination));
+        $transaction->save();
+        return $transaction;
     }
 
     public function save()
@@ -76,14 +114,14 @@ class TransactionEntity implements Entity
                 $this->id = null;
                 return $this->save();
             }
-            TransactionLogEntity::create(null, "UPDATE TRANSACTION - STATUS: $transaction->status, AMOUNT: $transaction->amount", $transaction);
+            TransactionLogEntity::create("UPDATE TRANSACTION: TYPE: {$this->transaction->get_type()}, STATUS: {$this->transaction->get_status()}, AMOUNT: {$this->transaction->amount}", $this->transaction);
             $this->transaction->update([
                 'type' => $this->type,
                 'amount' => $this->amount,
                 'status' => $this->status,
                 'scheduled_at' => $this->scheduled_at,
-                'account_source_id' => $this->accountSource->id,
-                'account_destination_id' => $this->accountDestination->id
+                'account_source_id' => $this->accountSource ? $this->accountSource->id : null,
+                'account_destination_id' => $this->accountDestination ? $this->accountDestination->id : null
             ]);
             
             return true;
@@ -93,12 +131,12 @@ class TransactionEntity implements Entity
                 'amount' => $this->amount,
                 'status' => $this->status,
                 'scheduled_at' => $this->scheduled_at,
-                'account_source_id' => $this->accountSource->id,
-                'account_destination_id' => $this->accountDestination->id
+                'account_source_id' => $this->accountSource ? $this->accountSource->id : null,
+                'account_destination_id' => $this->accountDestination ? $this->accountDestination->id : null
             ]);
             if ($this->transaction) {
                 $this->id = $this->transaction->id;
-                TransactionLogEntity::create(null, "CREATE TRANSACTION: STATUS: $transaction->status, AMOUNT: $transaction->amount", $transaction);
+                TransactionLogEntity::create("CREATE TRANSACTION: TYPE: {$this->transaction->get_type()}, STATUS: {$this->transaction->get_status()}, AMOUNT: {$this->transaction->amount}", $this->transaction);
                 return true;
             }
         }
@@ -113,14 +151,14 @@ class TransactionEntity implements Entity
             'amount' => $this->amount,
             'status' => $this->status,
             'scheduled_at' => $this->scheduled_at,
-            'account_source_id' => $this->accountSource->id,
-            'account_destination_id' => $this->accountDestination->id
+            'account_source_id' => $this->accountSource ? $this->accountSource->id : null,
+            'account_destination_id' => $this->accountDestination ? $this->accountDestination->id : null
         ];
     }
 
     public static function toEntity(Transaction $transaction): self
     {
-        return new self($transaction->id, $transaction->type, $transaction->amount, $transaction->status, $transaction->account_source_id, $transaction->account_destination_id);
+        return new self($transaction->id, $transaction->type, $transaction->amount, $transaction->status,$transaction->scheduled_at,$transaction->account_source_id, $transaction->account_destination_id);
     }
 
     public static function findById(int $id): ?self
@@ -135,5 +173,39 @@ class TransactionEntity implements Entity
     public static function query()
     {
         return Transaction::query();
+    }
+
+    public static function process(Transaction $transaction){
+        $transactionEntity = self::toEntity($transaction);
+
+        DB::transaction(function () use ($transaction, $transactionEntity) {
+            try {
+                if ($transaction->type === Transaction::TYPE_DEPOSIT) {
+                    $transaction->accountDestination->incrementBalance($transaction->amount);
+                }
+
+                if ($transaction->type === Transaction::TYPE_LOOT) {
+                    if ($transaction->accountSource->balance < $transaction->amount) {
+                        throw new \Exception('Insufficient balance');
+                    }
+                    $transaction->accountSource->decrementBalance($transaction->amount);
+                }
+
+                if ($transaction->type === Transaction::TYPE_LOOT && $transaction->accountDestination) {
+                    if ($transaction->accountSource->balance < $transaction->amount) {
+                        throw new \Exception('Insufficient balance');
+                    }
+                    $transaction->accountSource->incrementBalance('balance', $transaction->amount);
+                    $transaction->accountDestination->decrementBalance('balance', $transaction->amount);
+                }
+
+                $transactionEntity->set_status(Transaction::STATUS_DONE);
+                $transactionEntity->save();
+            } catch (\Throwable $e) {
+                $transactionEntity->set_status(Transaction::STATUS_FAIL);
+                $transactionEntity->save();
+                TransactionLogEntity::create(null, "ERROR TRANSACTION - TYPE: $transaction->get_type() STATUS: $transactionEntity->get_status(), AMOUNT: $transaction->amount - ERROR: $e", $transaction);
+            }
+        });
     }
 }
