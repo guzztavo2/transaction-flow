@@ -4,10 +4,13 @@ namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\InteractsWithQueue;
 use App\Models\Transaction;
+use App\Entities\TransactionEntity;
+
 class ProcessTransaction implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, InteractsWithQueue;
 
     /**
      * Create a new job instance.
@@ -31,5 +34,6 @@ class ProcessTransaction implements ShouldQueue
             return;
         }
         
+        TransactionEntity::process($transaction);
     }
 }
