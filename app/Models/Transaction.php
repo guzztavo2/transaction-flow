@@ -22,7 +22,9 @@ class Transaction extends Model
         'type',
         'amount',
         'status',
-        'scheduled_at'
+        'scheduled_at',
+        'account_source_id',
+        'account_destination_id'
     ];
 
     /**
