@@ -114,7 +114,6 @@ class TransactionEntity implements Entity
                 $this->id = null;
                 return $this->save();
             }
-            TransactionLogEntity::create("UPDATE TRANSACTION: TYPE: {$this->transaction->get_type()}, STATUS: {$this->transaction->get_status()}, AMOUNT: {$this->transaction->amount}", $this->transaction);
             $this->transaction->update([
                 'type' => $this->type,
                 'amount' => $this->amount,
@@ -123,7 +122,7 @@ class TransactionEntity implements Entity
                 'account_source_id' => $this->accountSource ? $this->accountSource->id : null,
                 'account_destination_id' => $this->accountDestination ? $this->accountDestination->id : null
             ]);
-            
+            TransactionLogEntity::create("UPDATE TRANSACTION: TYPE: {$this->transaction->get_type()}, STATUS: {$this->transaction->get_status()}, AMOUNT: {$this->transaction->amount}", $this->transaction);
             return true;
         } else {
             $this->transaction = Transaction::create([
@@ -204,7 +203,7 @@ class TransactionEntity implements Entity
             } catch (\Throwable $e) {
                 $transactionEntity->set_status(Transaction::STATUS_FAIL);
                 $transactionEntity->save();
-                TransactionLogEntity::create(null, "ERROR TRANSACTION - TYPE: $transaction->get_type() STATUS: $transactionEntity->get_status(), AMOUNT: $transaction->amount - ERROR: $e", $transaction);
+                TransactionLogEntity::create("ERROR TRANSACTION - TYPE: {$transaction->get_type()} STATUS: {$transaction->get_status()}, AMOUNT: $transaction->amount - ERROR: {$e->getMessage()}", $transaction);
             }
         });
     }
