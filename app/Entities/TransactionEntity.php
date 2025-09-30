@@ -99,7 +99,7 @@ class TransactionEntity implements Entity
             throw new \UnauthorizedException('Account destination not found');
     }
 
-    public static function create(int|Account $accountSource = null, int|Account $accountDestination = null, int $type, string $amount, int $status, Carbon $scheduled_at = null): self
+    public static function create(string|Account $accountSource = null, string|Account $accountDestination = null, int $type, string $amount, int $status, Carbon $scheduled_at = null): self
     {
         $transaction = (new self(null, $type, $amount, $status, $scheduled_at ,$accountSource, $accountDestination));
         $transaction->save();
@@ -160,7 +160,7 @@ class TransactionEntity implements Entity
         return new self($transaction->id, $transaction->type, $transaction->amount, $transaction->status,$transaction->scheduled_at,$transaction->account_source_id, $transaction->account_destination_id);
     }
 
-    public static function findById(int $id): ?self
+    public static function findById($id): ?self
     {
         $transaction = Transaction::find($id);
         if ($transaction)
@@ -183,12 +183,12 @@ class TransactionEntity implements Entity
                     $transaction->accountDestination->incrementBalance($transaction->amount);
                 
                 elseif ($transaction->type === Transaction::TYPE_LOOT) {
-                    if ($transaction->accountSource->balance < $transaction->amount) 
+                    if (!$transaction->accountSource->compareBalance($transaction->amount)) 
                         throw new \Exception('Insufficient balance');
                     
                     $transaction->accountSource->decrementBalance($transaction->amount);
                 } elseif ($transaction->type === Transaction::TYPE_TRANSFER) {
-                    if ($transaction->accountSource->balance < $transaction->amount) 
+                    if (!$transaction->accountSource->compareBalance($transaction->amount)) 
                         throw new \Exception('Insufficient balance');
                     
                     $transaction->accountSource->incrementBalance('balance', $transaction->amount);
@@ -198,7 +198,7 @@ class TransactionEntity implements Entity
                 $transactionEntity->set_status(Transaction::STATUS_DONE);
             } catch (\Throwable $e) {
                 $transactionEntity->set_status(Transaction::STATUS_FAIL);
-                TransactionLogEntity::create("ERROR TRANSACTION - TYPE: {$transaction->get_type()} STATUS: {$transaction->get_status()}, AMOUNT: $transaction->amount - ERROR: {$e->getMessage()}", $transaction);
+                TransactionLogEntity::create("ERROR TRANSACTION - TYPE: {$transaction->get_type()} STATUS: FAIL, AMOUNT: $transaction->amount - ERROR: {$e->getMessage()}", $transaction);
             }finally{
                 $transactionEntity->save();
             }

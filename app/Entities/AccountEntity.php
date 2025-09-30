@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use App\Models\Account;
 use App\Models\User;
+use App\Exceptions\UnauthorizedException;
 
 class AccountEntity implements Entity
 {
@@ -183,7 +184,7 @@ class AccountEntity implements Entity
         ];
     }
 
-    public static function findById(string $id): ?self
+    public static function findById($id): ?self
     {
         $account = Account::find($id);
         if (!$account)

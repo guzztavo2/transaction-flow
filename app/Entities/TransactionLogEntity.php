@@ -113,7 +113,7 @@ class TransactionLogEntity implements Entity
         return $log;    
     }
 
-    public static function findById(int $id): ?self
+    public static function findById($id): ?self
     {
         $transaction = TransactionLog::find($id);
         if ($transaction)

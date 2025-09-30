@@ -29,7 +29,7 @@ class UserEntity implements Entity
         $this->setUpdatedAt($updated_at);
     }
 
-    private function setId(int $id)
+    private function setId($id)
     {
         if ($user = User::find($id)) {
             $this->id = $id;
@@ -139,7 +139,7 @@ class UserEntity implements Entity
         return self::toEntity($user);
     }
 
-    public static function findById(int $id): UserEntity|null
+    public static function findById($id): UserEntity|null
     {
         $user = User::find($id);
         if ($user)

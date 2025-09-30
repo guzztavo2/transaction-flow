@@ -8,7 +8,7 @@ interface Entity
 
     public function toArray();
 
-    public static function findById(int $id): ?self;
+    public static function findById($id): ?self;
 
     public static function query();
 }
