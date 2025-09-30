@@ -46,11 +46,7 @@ class TransactionService extends Service
     }
 
     private function transactionDeposit(Request|array $request){
-        $accountDestination = null;
-        if(empty($request['accountDestination']))
-            $accountDestination = $this->accountService->accountByUser()->where('is_default', true)->first();
-        else
-            $accountDestination = $this->accountService->accountByUser()->where('id', $request['accountDestination'])->first();
+        $accountDestination = $this->accountService->accountByUser()->where('is_default', true)->first();
 
         if(is_null($accountDestination))
             return response()->json(['error' => true, 'message' => 'Account destination not found!'], 400);
@@ -59,6 +55,7 @@ class TransactionService extends Service
 
         if ($scheduled_at)
             $scheduled_at = Carbon::createFromFormat('m-d-Y', $request['scheduled_at']);
+
         $transaction = TransactionEntity::create(null, $accountDestination, Transaction::TYPE_DEPOSIT, $request['amount'], Transaction::STATUS_PENDING, $scheduled_at);
         
         ProcessTransaction::dispatch($transaction->get_id())->delay($scheduled_at ?? now());
@@ -73,8 +70,27 @@ class TransactionService extends Service
     }
     
     private function transactionLoot(Request|array $request){
-        if(empty($request['accountSource']))
-            return response()->json(['error' => true, 'message' => 'For loot type, accountSource is required!'], 400);
+        $accountSource = $this->accountService->accountByUser()->where('is_default', true)->first();
         
+        if(is_null($accountSource))
+            return response()->json(['error' => true, 'message' => 'Account source not found!'], 400);
+        
+        $scheduled_at = $request['scheduled_at'] ?? null;
+
+        if ($scheduled_at)
+            $scheduled_at = Carbon::createFromFormat('m-d-Y', $request['scheduled_at']);
+
+        $transaction = TransactionEntity::create($accountSource, null, Transaction::TYPE_LOOT, $request['amount'], Transaction::STATUS_PENDING, $scheduled_at);
+        
+        ProcessTransaction::dispatch($transaction->get_id())->delay($scheduled_at ?? now());
+        
+        $response = [
+            'type' => $transaction->get_transaction()->get_type(),
+            'amount' => $transaction->get_transaction()->amount,
+            'status' => $transaction->get_transaction()->get_status(),
+            'scheduled_at ' => $transaction->get_transaction()->scheduled_at ? $transaction->get_transaction()->scheduled_at->format('m-d-Y') : null,
+        ];
+        
+        return response()->json(array_filter($response, fn($v) => !empty($v)), 201);
     }
 }
