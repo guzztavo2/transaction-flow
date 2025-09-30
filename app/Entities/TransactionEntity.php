@@ -179,31 +179,28 @@ class TransactionEntity implements Entity
 
         DB::transaction(function () use ($transaction, $transactionEntity) {
             try {
-                if ($transaction->type === Transaction::TYPE_DEPOSIT) {
+                if ($transaction->type === Transaction::TYPE_DEPOSIT) 
                     $transaction->accountDestination->incrementBalance($transaction->amount);
-                }
-
-                if ($transaction->type === Transaction::TYPE_LOOT) {
-                    if ($transaction->accountSource->balance < $transaction->amount) {
+                
+                elseif ($transaction->type === Transaction::TYPE_LOOT) {
+                    if ($transaction->accountSource->balance < $transaction->amount) 
                         throw new \Exception('Insufficient balance');
-                    }
+                    
                     $transaction->accountSource->decrementBalance($transaction->amount);
-                }
-
-                if ($transaction->type === Transaction::TYPE_LOOT && $transaction->accountDestination) {
-                    if ($transaction->accountSource->balance < $transaction->amount) {
+                } elseif ($transaction->type === Transaction::TYPE_TRANSFER) {
+                    if ($transaction->accountSource->balance < $transaction->amount) 
                         throw new \Exception('Insufficient balance');
-                    }
+                    
                     $transaction->accountSource->incrementBalance('balance', $transaction->amount);
                     $transaction->accountDestination->decrementBalance('balance', $transaction->amount);
                 }
 
                 $transactionEntity->set_status(Transaction::STATUS_DONE);
-                $transactionEntity->save();
             } catch (\Throwable $e) {
                 $transactionEntity->set_status(Transaction::STATUS_FAIL);
-                $transactionEntity->save();
                 TransactionLogEntity::create("ERROR TRANSACTION - TYPE: {$transaction->get_type()} STATUS: {$transaction->get_status()}, AMOUNT: $transaction->amount - ERROR: {$e->getMessage()}", $transaction);
+            }finally{
+                $transactionEntity->save();
             }
         });
     }
