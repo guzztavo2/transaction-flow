@@ -37,7 +37,7 @@ class AccountEntity implements Entity
 
     public function setId(?string $id)
     {
-        if (empty($id) || !$account = $this->findById($id))
+        if (empty($id) || !$account = Account::find($id))
             return;
 
         $this->id = $id;
@@ -128,17 +128,10 @@ class AccountEntity implements Entity
         return $account;
     }
 
-    public function toEntity(Account $account): self
+    public static function toEntity(Account $account): self
     {
-        return new self(
-            $account->id,
-            $account->bank,
-            $account->agency,
-            $account->number_account,
-            $account->balance,
-            $account->user_id,
-            $account->is_default
-        );
+        return (new self($account->id, $account->bank, $account->agency, 
+        $account->number_account, $account->balance, $account->user_id, $account->is_default));
     }
 
     public function save()
@@ -190,7 +183,7 @@ class AccountEntity implements Entity
         if (!$account)
             return null;
 
-        return $this->toEntity($account);
+        return self::toEntity($account);
     }
 
     public static function query()
