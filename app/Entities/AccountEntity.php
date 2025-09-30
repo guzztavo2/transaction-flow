@@ -36,7 +36,7 @@ class AccountEntity implements Entity
 
     public function setId(?string $id)
     {
-        if (empty($id) or !$account = $this->findById($id))
+        if (empty($id) || !$account = $this->findById($id))
             return;
 
         $this->id = $id;
@@ -183,7 +183,7 @@ class AccountEntity implements Entity
         ];
     }
 
-    public static function findById(int $id): ?self
+    public static function findById(string $id): ?self
     {
         $account = Account::find($id);
         if (!$account)
