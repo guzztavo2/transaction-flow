@@ -11,6 +11,7 @@ use Illuminate\Validation\Rules\Password;
 use App\Jobs\ResetPasswordJob;
 use App\Http\Services\AccountService;
 use App\Entities\TransactionEntity;
+use App\Entities\AccountEntity;
 use App\Jobs\ProcessTransaction;
 
 class TransactionService extends Service
@@ -32,17 +33,23 @@ class TransactionService extends Service
         if($request['type'] == Transaction::TYPE_TRANSFER)
             return $this->transactionTransfer($request->toArray());
         
-        if($request['type'] == Transaction::TYPE_DEPOSIT)
+        elseif($request['type'] == Transaction::TYPE_DEPOSIT)
             return $this->transactionDeposit($request->toArray());
         
-        if($request['type'] == Transaction::TYPE_LOOT)
+        elseif($request['type'] == Transaction::TYPE_LOOT)
             return $this->transactionLoot($request->toArray());
+        else 
+            return response()->json(['error' => true, 'message' => 'Transaction type not valid!'], 400);
     }
 
     private function transactionTransfer(Request|array $request){
-        if (empty($request['accountSource']) || empty($request['accountDestination']))
+        $accountSource = $this->accountService->accountByUser()->where('is_default', true)->first();
+        $accountDestination = AccountEntity::findById($request['accountDestination'] ?? '');
+
+        if (empty($accountSource) || empty($accountDestination))
             return response()->json(['error' => true, 'message' => 'For transfer type, accountSource and accountDestination are required!'], 400);
         
+        return $this->prepare_response($request, $accountDestination, $accountSource, Transaction::TYPE_TRANSFER);
     }
 
     private function transactionDeposit(Request|array $request){
@@ -51,12 +58,25 @@ class TransactionService extends Service
         if(is_null($accountDestination))
             return response()->json(['error' => true, 'message' => 'Account destination not found!'], 400);
         
+        return $this->prepare_response($request, $accountDestination, null, Transaction::TYPE_LOOT);
+    }
+    
+    private function transactionLoot(Request|array $request){
+        $accountSource = $this->accountService->accountByUser()->where('is_default', true)->first();
+        
+        if(is_null($accountSource))
+            return response()->json(['error' => true, 'message' => 'Account source not found!'], 400);
+        
+        return $this->prepare_response($request, null, $accountSource, Transaction::TYPE_LOOT);
+    }
+
+    private function prepare_response(array $request, ?string $accountDestination = null, ?string $accountSource = null, int $transaction_type){
         $scheduled_at = $request['scheduled_at'] ?? null;
 
         if ($scheduled_at)
             $scheduled_at = Carbon::createFromFormat('m-d-Y', $request['scheduled_at']);
 
-        $transaction = TransactionEntity::create(null, $accountDestination, Transaction::TYPE_DEPOSIT, $request['amount'], Transaction::STATUS_PENDING, $scheduled_at);
+        $transaction = TransactionEntity::create($accountSource, $accountDestination, $transaction_type, $request['amount'], Transaction::STATUS_PENDING, $scheduled_at);
         
         ProcessTransaction::dispatch($transaction->get_id())->delay($scheduled_at ?? now());
         
@@ -66,31 +86,6 @@ class TransactionService extends Service
             'status' => $transaction->get_transaction()->get_status(),
             'scheduled_at ' => $transaction->get_transaction()->scheduled_at ? $transaction->get_transaction()->scheduled_at->format('d-m-Y') : null,
         ];
-        return response()->json(array_filter($response, fn($v) => !empty($v)), 201);
-    }
-    
-    private function transactionLoot(Request|array $request){
-        $accountSource = $this->accountService->accountByUser()->where('is_default', true)->first();
-        
-        if(is_null($accountSource))
-            return response()->json(['error' => true, 'message' => 'Account source not found!'], 400);
-        
-        $scheduled_at = $request['scheduled_at'] ?? null;
-
-        if ($scheduled_at)
-            $scheduled_at = Carbon::createFromFormat('m-d-Y', $request['scheduled_at']);
-
-        $transaction = TransactionEntity::create($accountSource, null, Transaction::TYPE_LOOT, $request['amount'], Transaction::STATUS_PENDING, $scheduled_at);
-        
-        ProcessTransaction::dispatch($transaction->get_id())->delay($scheduled_at ?? now());
-        
-        $response = [
-            'type' => $transaction->get_transaction()->get_type(),
-            'amount' => $transaction->get_transaction()->amount,
-            'status' => $transaction->get_transaction()->get_status(),
-            'scheduled_at ' => $transaction->get_transaction()->scheduled_at ? $transaction->get_transaction()->scheduled_at->format('m-d-Y') : null,
-        ];
-        
         return response()->json(array_filter($response, fn($v) => !empty($v)), 201);
     }
 }
