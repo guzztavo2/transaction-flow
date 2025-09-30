@@ -28,8 +28,6 @@ Route::middleware('api')->group(function () {
     });
 
     Route::prefix('transactions')->group(function () {
-        Route::get('/', 'App\Http\Controllers\TransactionController@index');
-        Route::get('/{id}', 'App\Http\Controllers\TransactionController@show');
         Route::post('/', 'App\Http\Controllers\TransactionController@store');
     });
 });
