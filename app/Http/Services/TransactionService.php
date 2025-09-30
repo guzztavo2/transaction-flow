@@ -50,7 +50,7 @@ class TransactionService extends Service
         if (empty($accountSource) || empty($accountDestination))
             return response()->json(['error' => true, 'message' => 'For transfer type, accountSource and accountDestination are required!'], 400);
         
-        return $this->prepare_response($request, $accountDestination, $accountSource, Transaction::TYPE_TRANSFER);
+        return $this->prepare_response($request, $accountDestination->getAccount(), $accountSource, Transaction::TYPE_TRANSFER);
     }
 
     private function transactionDeposit(Request|array $request){

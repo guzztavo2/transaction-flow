@@ -191,8 +191,8 @@ class TransactionEntity implements Entity
                     if (!$transaction->accountSource->compareBalance($transaction->amount)) 
                         throw new \Exception('Insufficient balance');
                     
-                    $transaction->accountSource->incrementBalance('balance', $transaction->amount);
-                    $transaction->accountDestination->decrementBalance('balance', $transaction->amount);
+                    $transaction->accountSource->decrementBalance($transaction->amount);
+                    $transaction->accountDestination->incrementBalance($transaction->amount);
                 }
 
                 $transactionEntity->set_status(Transaction::STATUS_DONE);
