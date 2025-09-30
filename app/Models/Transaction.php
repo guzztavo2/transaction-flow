@@ -73,12 +73,12 @@ class Transaction extends Model
         if ($status < 0 || $status > Transaction::STATUS_PENDING)
             throw new \Exception('Transaction not good selected');
 
-        if (is_int($account_source))
+        if (is_string($account_source))
             $account_source = Account::find($account_source);
         if (is_null($account_source))
             throw new \Exception('Account not localized');
 
-        if (is_int($account_destination))
+        if (is_string($account_destination))
             $account_destination = Account::find($account_destination);
         
         if (is_null($account_destination))
