@@ -13,6 +13,7 @@ use App\Http\Services\AccountService;
 use App\Entities\TransactionEntity;
 use App\Entities\AccountEntity;
 use App\Jobs\ProcessTransaction;
+use App\Models\Account;
 
 class TransactionService extends Service
 {
@@ -58,7 +59,7 @@ class TransactionService extends Service
         if(is_null($accountDestination))
             return response()->json(['error' => true, 'message' => 'Account destination not found!'], 400);
         
-        return $this->prepare_response($request, $accountDestination, null, Transaction::TYPE_LOOT);
+        return $this->prepare_response($request, $accountDestination, null, Transaction::TYPE_DEPOSIT);
     }
     
     private function transactionLoot(Request|array $request){
@@ -70,7 +71,7 @@ class TransactionService extends Service
         return $this->prepare_response($request, null, $accountSource, Transaction::TYPE_LOOT);
     }
 
-    private function prepare_response(array $request, ?string $accountDestination = null, ?string $accountSource = null, int $transaction_type){
+    private function prepare_response(array $request, string|Account $accountDestination = null, string|Account $accountSource = null, int $transaction_type){
         $scheduled_at = $request['scheduled_at'] ?? null;
 
         if ($scheduled_at)

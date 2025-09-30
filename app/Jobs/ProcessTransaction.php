@@ -13,7 +13,7 @@ class ProcessTransaction implements ShouldQueue
 {
     use Queueable, InteractsWithQueue;
 
-    public int $tries = 1;
+    public int $tries = 3;
     /**
      * Create a new job instance.
      */
