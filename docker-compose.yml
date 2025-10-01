@@ -53,6 +53,7 @@ services:
 
   redis:
     image: redis:latest
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
     container_name: redis_cache
     restart: unless-stopped
     ports:
