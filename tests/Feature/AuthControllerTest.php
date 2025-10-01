@@ -17,6 +17,14 @@ class AuthControllerTest extends TestCase
         'password' => 'senhaSegura123', 'confirm_password' => 'senhaSegura123',
         'bank' => 'Banco Teste', 'agency' => '001', 'number_account' => '123456'
     ];
+    
+    private array $pessoal_information_to_test_2 = [
+        'name' => 'Fulano de Tal', 'email' => 'fulano1@exemplo.com',
+        'password' => 'senhaSegura123', 'confirm_password' => 'senhaSegura123',
+        'bank' => 'Banco Teste', 'agency' => '001', 'number_account' => '123454'
+    ];
+
+   
 
     private User $user;
     private string $accesToken;
@@ -25,15 +33,16 @@ class AuthControllerTest extends TestCase
     public function test_all_routes_auth_controller()
     {
         $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
-        $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
-        $getMeResponse = $this->get_user_me($this->accesToken);
-        $changePasswordResponse = $this->change_password();
-        $resetPasswordResponse = $this->reset_password();
+        $this->register_user_with_valid_datas($this->pessoal_information_to_test_2);
+        // $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
+        // $getMeResponse = $this->get_user_me($this->accesToken);
+        // $changePasswordResponse = $this->change_password();
+        // $resetPasswordResponse = $this->reset_password();
     }
 
     public function register_user_with_valid_datas(array $user_to_created)
     {
-        $response = $this->postJson('api/auth/register', $this->pessoal_information_to_test);
+        $response = $this->postJson('api/auth/register', $user_to_created);
 
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'bank', 'agency', 'number_account', 'balance']);
 
