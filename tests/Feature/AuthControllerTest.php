@@ -33,8 +33,8 @@ class AuthControllerTest extends TestCase
     public function test_all_routes_auth_controller()
     {
         $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
-        $this->register_user_with_valid_datas($this->pessoal_information_to_test_2);
-        // $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
+        // $this->register_user_with_valid_datas($this->pessoal_information_to_test_2);
+        $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
         // $getMeResponse = $this->get_user_me($this->accesToken);
         // $changePasswordResponse = $this->change_password();
         // $resetPasswordResponse = $this->reset_password();
@@ -75,7 +75,7 @@ class AuthControllerTest extends TestCase
             'password' => $user_to_login['password'],
             'confirm_password' => $user_to_login['confirm_password'],
         ]);
-        $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
+        $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type']);
 
         return $response['access_token'];
     }

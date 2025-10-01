@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Jobs\ResetPasswordJob;
+use Illuminate\Support\Facades\Redis;
 
 class AuthService extends Service
 {
-    private const TOKEN_MAX_SECONDS = 7200;  // 7200 Sec = 2 HOURS
+    private int $TOKEN_MAX_SECONDS = 7200;  // 7200 Sec = 2 HOURS
     private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;
 
     public function register(Request $request)
@@ -44,17 +45,18 @@ class AuthService extends Service
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => ['email:strict,dns,spoof', 'required', 'max:100', 'string'],
-            'password' => ['required', 'max:100', 'string']
-        ]);
-
-        $credentials = request(['email', 'password']);
+        $request->validate(['email' => ['email:strict,dns,spoof', 'required', 'max:100', 'string'], 'password' => ['required', 'max:100', 'string'], 'remember' => ['nullable', 'boolean']]);
+        
+        $credentials = $request->only(['email', 'password']);
         $user = User::where('email', $request->email)->first();
-        if (!$token = auth('api')->setTTL(self::TOKEN_MAX_SECONDS)->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
 
+        $expiresAt = $request->boolean('remember') ? 60 * 24 * 7 : 60 * 4; //time in minutes
+        $this->TOKEN_MAX_SECONDS = $expiresAt * 60; // converted to seconds
+
+        if (!$token = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->attempt($credentials)) 
+            return response()->json(['error' => 'Unauthorized'], 401);
+        
+        Redis::setex("user:{$user->id}:session", $this->TOKEN_MAX_SECONDS, $token);
         return $this->respondWithToken($token);
     }
 
@@ -66,13 +68,38 @@ class AuthService extends Service
 
     public function logout()
     {
-        auth('api')->logout();
+        $user = auth('api')->user();
+
+        if ($user) {
+            Redis::del("user:{$user->id}:session");
+            auth('api')->logout();
+        }
+
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    public function refresh()
+    public function refresh(Request $request)
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        $user = auth('api')->user();
+        if(!$user){
+            $this->logout();
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $token_ = $request->bearerToken();
+
+        $key = "user:{$user->id}:session";
+        $validToken = Redis::get($key);
+
+        if(!$validToken || $token_ !== $validToken){
+            $this->logout();
+            return response()->json(['error' => 'Session expired or invalid. Please log in again.'], 401);
+        }
+        
+        $newToken = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->refresh();
+        Redis::setex("user:{$user->id}:session", $ttl, $newToken);
+
+        return $this->respondWithToken($newToken);
     }
 
     public function changePassword(Request $request, string $token = null)
@@ -96,7 +123,7 @@ class AuthService extends Service
 
         $credentials = ['email' => $user->email, 'password' => $request->new_password];
 
-        if (!$token = auth('api')->setTTL(self::TOKEN_MAX_SECONDS)->attempt($credentials))
+        if (!$token = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->attempt($credentials))
             return response()->json(['error' => 'Unable to access the user, please try again.'], 401);
 
         return $this->respondWithToken($token);
@@ -146,7 +173,7 @@ class AuthService extends Service
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60  // convert to seconds to hour
-        ]);
+            'expires_in_hours' => auth('api')->factory()->getTTL() / 60 / 60, // convert to seconds to hour
+            ]);
     }
 }
