@@ -1,6 +1,5 @@
 FROM php:8.3-cli
 
-# Instala extensões do PHP
 RUN apt-get update && apt-get install -y \
     git unzip curl libpng-dev libjpeg-dev libfreetype6-dev libonig-dev \
     libicu-dev \
@@ -11,9 +10,8 @@ RUN apt-get update && apt-get install -y \
 
 RUN apt-get update && apt-get install -y supervisor
 RUN docker-php-ext-install bcmath
-RUN pecl install xdebug && docker-php-ext-enable xdebug 
-#\
- #&& pecl install redis && docker-php-ext-enable redis
+RUN pecl install xdebug && docker-php-ext-enable xdebug \
+&& pecl install redis && docker-php-ext-enable redis
 
 COPY ./php/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 RUN apt-get update && apt-get install -y nano
