@@ -43,8 +43,8 @@ class AuthController extends Controller
         return $this->service->logout();
     }
 
-    public function refresh()
+    public function refresh(Request $request)
     {
-        return $this->service->refresh();
+        return $this->service->refresh($request);
     }
 }
