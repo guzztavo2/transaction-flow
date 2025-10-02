@@ -20,7 +20,7 @@ class CheckUserSession
         if(!$user)
             return response()->json(['error' => 'Unauthorized'], 401);
 
-        $currentToken = $request->bearerToken();
+        $currentToken = $request->header('authorization');
         $validToken = Redis::get("user:{$user->id}:session");
 
         if(!$validToken || $currentToken !== $validToken){

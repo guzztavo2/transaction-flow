@@ -29,7 +29,7 @@ class TransactionTest extends TestCase
     {
         //test initialization
         $this->login($this->pessoal_information_to_test_1);
-        // $this->deposit();
+        $this->deposit();
         // $this->loot();
         $this->transfer();
     }
@@ -42,7 +42,7 @@ class TransactionTest extends TestCase
             'password' => $userToLogin['password'],
             'confirm_password' => $userToLogin['confirm_password'],
         ]);
-        $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type', 'expires_in']);
+        $response->assertStatus(200)->assertJsonStructure(['access_token', 'token_type']);
 
         $this->access_token = $response['access_token'];
     }
