@@ -51,13 +51,28 @@ docker compose up -d --build
 
 ### 4. Instale as dependências do Laravel
 ```bash
-docker exec -it laravel_app composer install
-docker exec -it laravel_app php artisan migrate --seed
+docker exec -it laravel_app php artisan migrate
 ```
 
-### 5. Acesse a aplicação
+### 5. Ative o SUPERVISOR - Rodar jobs em segundo plano
+Para rodar em segundo plano, o ideal é após fazer o migration, é voltar ao host, e executar:
+```bash
+docker restart laravel_supervisor laravel_queue
+```
+
+### 6. Acesse a aplicação
 - API disponível em: **http://localhost:8000**
 
+### 7. Testes disponíveis
+Você pode rodar os testes da aplicação, que estão no seguinte diretório:
+```bash
+transaction-flow/backend/tests
+```
+
+Para rodar os testes você pode usar o seguinte comando (dentro do container da aplicação principal, aqui: laravel_app):
+```bash
+php vendor/bin/phpunit tests/Feature/{no do arquivo}
+```
 ---
 
 ## 🗄️ Banco de Dados
