@@ -63,7 +63,7 @@ class AuthService extends Service
     public function me()
     {
         $user = auth('api')->user();
-        return response()->json((array_filter($user->toArray(), fn($key) => $key != 'id', ARRAY_FILTER_USE_KEY)), 200);
+        return response()->json((array_filter($user->toArray(), fn($key, $val) => $key != 'id' && !empty($val) && boolval($val) != false, ARRAY_FILTER_USE_BOTH)), 200);
     }
 
     public function logout()
