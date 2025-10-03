@@ -173,7 +173,7 @@ class AuthService extends Service
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in_hours' => auth('api')->factory()->getTTL() / 60 / 60, // convert to seconds to hour
+            'expires_in' => auth('api')->factory()->getTTL()
             ]);
     }
 }
