@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { defineAsyncComponent, computed } from 'vue';
 import { resolveRoute } from '../routes/index';
+import pageLayout from './layout/pageLayout.vue';
 
 const view = computed(() => defineAsyncComponent(() => resolveRoute()['component']()));
 console.log(view);
 </script>
 
 <template>
-    <component :is="view" />
+    <page-layout>
+        <component :is="view" />
+    </page-layout>
 </template>

@@ -4,9 +4,11 @@ import routerView from './components/routerView.vue';
 </script>
 
 <template>
-  <navBar></navBar>
+  <div class="flex flex-col w-full h-screen justify-content-center align-items-center flex-nowrap p-1">
+    <navBar></navBar>
 
-  <routerView></routerView>
+    <routerView></routerView>
+  </div>
 </template>
 
 <style></style>
