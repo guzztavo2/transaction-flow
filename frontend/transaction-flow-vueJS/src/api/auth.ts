@@ -1,5 +1,5 @@
 import { api } from './http'
-import { User } from '@/types/user'
+import { User } from '@/types/User'
 
 export async function login(email: string, password: string, remember: boolean = false): Promise<User> {
     try {
