@@ -8,9 +8,14 @@ window.addEventListener('popstate', () => {
     currentRoute.value = window.location.pathname || "/"
 });
 
+export function navigateTo(path: string) {
+    window.history.pushState({}, '', path);
+    currentRoute.value = path;
+}
+
 export function resolveRoute() {
     const auth = useAuthStore();
-    const path = currentRoute.value as string;
+    const path = currentRoute.value;
     if (path in publicRoutes)
         return publicRoutes[path as keyof typeof publicRoutes] || publicRoutes['/'];
 
