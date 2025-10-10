@@ -1,10 +1,9 @@
 <template>
   <footer class="footer footer-horizontal footer-center bg-base-200 text-base-content rounded p-10">
     <nav class="grid grid-flow-col gap-4">
-      <a class="link link-hover">About us</a>
-      <a class="link link-hover">Contact</a>
-      <a class="link link-hover">Jobs</a>
-      <a class="link link-hover">Press kit</a>
+      <a class="link link-hover">{{ content[0] }}</a>
+      <a class="link link-hover">{{ content[1] }}</a>
+      <a class="link link-hover">{{ content[2] }}</a>
     </nav>
     <nav>
       <div class="grid grid-flow-col gap-4">
@@ -38,32 +37,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-// import { useLanguageStore, type Language } from "@/stores/language";
+import { ref, watch } from "vue";
+import { useLanguageStore } from "@/stores/language";
 
-const theme = ref('dark');
+const content = ref();
 
-// const languageStore = useLanguageStore();
+const languageStore = useLanguageStore();
 
-function handleChangeTheme() {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) {
-    theme.value = savedTheme;
-    document.documentElement.setAttribute("data-theme", savedTheme);
+function updateContent() {
+  if (languageStore.language === 'EN') {
+    content.value = ['About us', 'Contact', 'Jobs'];
+  } else {
+    content.value = ['Sobre nós', 'Contato', 'Empregos'];
   }
-
-  watch(theme, (newTheme) => {
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
-  });
 }
-
-onMounted(() => {
-  handleChangeTheme();
+updateContent();
+watch(() => languageStore.language, () => {
+  updateContent();
 });
 
-// const contentMenu: Record<Language, string[]> = {
-
-// }
 
 </script>
