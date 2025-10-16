@@ -12,12 +12,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Jobs\ResetPasswordJob;
 use Illuminate\Support\Facades\Redis;
+use App\Domain\Actions\User\CreateUserAction;
+use App\Domain\Actions\Account\CreateAccountAction;
+use App\Domain\DTOs\UserData;
+use App\Domain\DTOs\AccountData;
+use App\Domain\Entities\User as UserEntityM;
+use App\Domain\Entities\Account as AccountEntityM;
 
 class AuthService extends Service
 {
     private int $TOKEN_MAX_SECONDS = 7200;  // 7200 Sec = 2 HOURS
     private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;
 
+    public function __construct(private CreateUserAction $createUserAction, private CreateAccountAction $createAccountAction){
+
+    }
     public function register(Request $request)
     {
         $request->validate([
@@ -30,17 +39,10 @@ class AuthService extends Service
             'number_account' => ['required', 'max:100', 'string']
         ]);
 
-        $user = UserEntity::create($request['name'], $request['email'], $request['password']);
-        $account = AccountEntity::create($request['bank'], $request['agency'], $request['number_account'], 0.0, true, $user->getUser());
-
-        return response()->json([
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-            'bank' => $account->getBank(),
-            'agency' => $account->getAgency(),
-            'number_account' => $account->getNumberAccount(),
-            'balance' => $account->getBalance()
-        ], 200);
+        $user = ($this->createUserAction)(new UserData(null, $request['name'], $request['email'], $request['password'], null, null));
+        $account = ($this->createAccountAction)(new AccountData($request['bank'], $request['agency'], $request['number_account'], $request['balance'], true, $user->getId()));
+        
+        return response()->json(['name' => $user->getName(), 'email' => $user->getEmail(), 'bank' => $account->getBank(), 'agency' => $account->getAgency(), 'number_account' => $account->getNumberAccount(), 'balance' => $account->getBalance() ], 200);
     }
 
     public function login(Request $request)

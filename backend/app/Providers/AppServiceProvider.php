@@ -13,10 +13,10 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         $this->app->bind(\App\Domain\Repositories\Account\AccountRepositoryInterface::class,
-        \App\Domain\Repositories\Account\EloquenAccountRepository::class);
+        \App\Domain\Repositories\Account\EloquentAccountRepository::class);
 
         $this->app->bind(\App\Domain\Repositories\User\UserRepositoryInterface::class, 
-            \App\Domain\Repositories\User\EloquenUserRepository::class);
+            \App\Domain\Repositories\User\EloquentUserRepository::class);
     }
 
     /**

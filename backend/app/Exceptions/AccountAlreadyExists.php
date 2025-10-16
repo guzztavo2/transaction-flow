@@ -2,4 +2,4 @@
 
 namespace App\Exceptions;
  
-final class UnauthorizedException extends ExceptionRender{}
+final class AccountAlreadyExists extends ExceptionRender{}

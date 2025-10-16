@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     private array $pessoal_information_to_test = [
         'name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com',
@@ -42,7 +42,7 @@ class AuthControllerTest extends TestCase
 
     public function register_user_with_valid_datas(array $user_to_created)
     {
-        $response = $this->postJson('api/auth/register', $user_to_created);
+        $response = $this->postJson(uri: 'api/auth/register', data: $user_to_created);
 
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'bank', 'agency', 'number_account', 'balance']);
 
