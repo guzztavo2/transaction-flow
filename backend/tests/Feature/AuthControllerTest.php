@@ -13,25 +13,40 @@ class AuthControllerTest extends TestCase
     use RefreshDatabase;
 
     private array $pessoal_information_to_test = [
-        'name' => 'Fulano de Tal', 'email' => 'fulano@exemplo.com',
-        'password' => 'senhaSegura123', 'confirm_password' => 'senhaSegura123',
-        'bank' => 'Banco Teste', 'agency' => '001', 'number_account' => '123456'
-    ];
-    
-    private array $pessoal_information_to_test_2 = [
-        'name' => 'Fulano de Tal', 'email' => 'fulano1@exemplo.com',
-        'password' => 'senhaSegura123', 'confirm_password' => 'senhaSegura123',
-        'bank' => 'Banco Teste', 'agency' => '001', 'number_account' => '123454'
+        'name' => 'Fulano de Tal',
+        'email' => 'fulano@exemplo.com',
+        'password' => 'senhaSegura123',
+        'confirm_password' => 'senhaSegura123',
+        'bank' => 'Banco Teste',
+        'agency' => '001',
+        'number_account' => '123456'
     ];
 
-   
+    private array $pessoal_information_to_test_2 = [
+        'name' => 'Fulano de Tal',
+        'email' => 'fulano1@exemplo.com',
+        'password' => 'senhaSegura123',
+        'confirm_password' => 'senhaSegura123',
+        'bank' => 'Banco Teste',
+        'agency' => '001',
+        'number_account' => '123454'
+    ];
+
+
 
     private User $user;
     private string $accesToken;
 
+    private function bindFakeRepositories()
+    {
+        $this->app->bind(\App\Domain\Repositories\User\UserRepositoryInterface::class, \Tests\Fake\FakeUserRepository::class);
+        $this->app->bind(\App\Domain\Repositories\Account\AccountRepositoryInterface::class, \Tests\Fake\FakeAccountRepository::class);
+    }
+
     #[Test]
     public function test_all_routes_auth_controller()
     {
+        $this->bindFakeRepositories();
         $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
         // $this->register_user_with_valid_datas($this->pessoal_information_to_test_2);
         // $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
@@ -42,7 +57,13 @@ class AuthControllerTest extends TestCase
 
     public function register_user_with_valid_datas(array $user_to_created)
     {
-        $response = $this->postJson(uri: 'api/auth/register', data: $user_to_created);
+        $fakeRepo = new \Tests\Fake\FakeUserRepository();
+        $this->app->instance(\App\Domain\Repositories\User\UserRepositoryInterface::class, $fakeRepo);
+
+        $fakeAccountRepo = new \Tests\Fake\FakeAccountRepository();
+        $this->app->instance(\App\Domain\Repositories\Account\AccountRepositoryInterface::class, $fakeAccountRepo);
+
+        $response = $this->postJson('api/auth/register', $user_to_created);
 
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'bank', 'agency', 'number_account', 'balance']);
 
@@ -53,8 +74,12 @@ class AuthControllerTest extends TestCase
 
         $this->user = User::first();
 
-        $this->assertDatabaseHas('accounts', ['bank' => $user_to_created['bank'], 'agency' => $user_to_created['agency'],
-            'number_account' => $user_to_created['number_account'], 'balance' => 0.0]);
+        $this->assertDatabaseHas('accounts', [
+            'bank' => $user_to_created['bank'],
+            'agency' => $user_to_created['agency'],
+            'number_account' => $user_to_created['number_account'],
+            'balance' => 0.0
+        ]);
         return $response;
     }
 

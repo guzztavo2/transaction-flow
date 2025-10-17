@@ -3,23 +3,12 @@
 namespace App\Domain\Entities;
 
 use App\Domain\DTOs\UserData;
-use App\Domain\Repositories\User\UserRepositoryInterface;
 
 final class User
 {
-    private UserRepositoryInterface $userRepositoryInterface;
 
-    public function __construct(private UserData $data)
-    {
-        $this->check_id();
-    }
+    public function __construct(private UserData $data) {}
 
-    private function check_id()
-    {
-        $id = $this->getId();
-        if (empty($this->userRepositoryInterface->findById($id)))
-            $this->data->setId();
-    }
     public function toArray(): array
     {
 

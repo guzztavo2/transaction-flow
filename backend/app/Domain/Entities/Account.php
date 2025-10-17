@@ -4,13 +4,10 @@ namespace App\Domain\Entities;
 
 use InvalidArgumentException;
 use App\Domain\DTOs\AccountData;
-use App\Domain\Repositories\User\UserRepositoryInterface;
 use App\Exceptions\UserNotFound;
 
 final class Account
 {
-
-    private UserRepositoryInterface $userRepositoryInterface;
 
     public function __construct(private AccountData $data)
     {
@@ -19,15 +16,8 @@ final class Account
 
     public function check_balance()
     {
-        if (bcomp($this->data->getBalance(), '0', 2) < 0)
+        if (bccomp($this->data->getBalance(), '0', 2) < 0)
             throw new InvalidArgumentException('Balance dont be negative.');
-    }
-
-    public function check_user_id()
-    {
-        $user_id = $this->data->getUserId();
-        if (is_null($this->userRepositoryInterface->findById($user_id)))
-            throw new UserNotFound();
     }
 
     public function credit(string $amount)
@@ -90,7 +80,7 @@ final class Account
     {
 
         return new self((new AccountData(
-            $data['id'],
+            $data['id'] ?? null,
             $data['bank'],
             $data['agency'],
             $data['number_account'],

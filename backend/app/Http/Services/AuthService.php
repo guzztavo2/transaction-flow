@@ -24,9 +24,7 @@ class AuthService extends Service
     private int $TOKEN_MAX_SECONDS = 7200;  // 7200 Sec = 2 HOURS
     private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;
 
-    public function __construct(private CreateUserAction $createUserAction, private CreateAccountAction $createAccountAction){
-
-    }
+    public function __construct(private CreateUserAction $createUserAction, private CreateAccountAction $createAccountAction) {}
     public function register(Request $request)
     {
         $request->validate([
@@ -40,24 +38,24 @@ class AuthService extends Service
         ]);
 
         $user = ($this->createUserAction)(new UserData(null, $request['name'], $request['email'], $request['password'], null, null));
-        $account = ($this->createAccountAction)(new AccountData($request['bank'], $request['agency'], $request['number_account'], $request['balance'], true, $user->getId()));
-        
-        return response()->json(['name' => $user->getName(), 'email' => $user->getEmail(), 'bank' => $account->getBank(), 'agency' => $account->getAgency(), 'number_account' => $account->getNumberAccount(), 'balance' => $account->getBalance() ], 200);
+        $account = ($this->createAccountAction)(new AccountData(null, $request['bank'], $request['agency'], $request['number_account'], 0, true, $user->getId()));
+
+        return response()->json(['name' => $user->getName(), 'email' => $user->getEmail(), 'bank' => $account->getBank(), 'agency' => $account->getAgency(), 'number_account' => $account->getNumberAccount(), 'balance' => $account->getBalance()], 200);
     }
 
     public function login(Request $request)
     {
         $request->validate(['email' => ['email:strict,dns,spoof', 'required', 'max:100', 'string'], 'password' => ['required', 'max:100', 'string'], 'remember' => ['nullable', 'boolean']]);
-        
+
         $credentials = $request->only(['email', 'password']);
         $user = User::where('email', $request->email)->first();
 
         $expiresAt = $request->boolean('remember') ? 60 * 24 * 7 : 60 * 4; //time in minutes
         $this->TOKEN_MAX_SECONDS = $expiresAt * 60; // converted to seconds
 
-        if (!$token = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->attempt($credentials)) 
+        if (!$token = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->attempt($credentials))
             return response()->json(['error' => 'Unauthorized'], 401);
-        
+
         Redis::setex("user:{$user->id}:session", $this->TOKEN_MAX_SECONDS, $token);
         return $this->respondWithToken($token);
     }
@@ -83,7 +81,7 @@ class AuthService extends Service
     public function refresh(Request $request)
     {
         $user = auth('api')->user();
-        if(!$user){
+        if (!$user) {
             $this->logout();
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -93,18 +91,18 @@ class AuthService extends Service
         $key = "user:{$user->id}:session";
         $validToken = Redis::get($key);
 
-        if(!$validToken || $token_ !== $validToken){
+        if (!$validToken || $token_ !== $validToken) {
             $this->logout();
             return response()->json(['error' => 'Session expired or invalid. Please log in again.'], 401);
         }
-        
+
         $newToken = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->refresh();
         Redis::setex("user:{$user->id}:session", $ttl, $newToken);
 
         return $this->respondWithToken($newToken);
     }
 
-    public function changePassword(Request $request, string $token = null)
+    public function changePassword(Request $request, ?string $token = null)
     {
         $request->validate([
             'password' => ['required', 'max:100', 'string', 'same:password'],
@@ -165,7 +163,7 @@ class AuthService extends Service
             'email' => ['required', 'max:100', 'string', 'exists:users,email']
         ]);
         $user = User::where('email', $request->email)->first();
-        
+
         ResetPasswordJob::dispatch($user->id, self::RECOVERY_PASSWORD_TOKEN_HOUR);
         return response()->json('An email was sent to reset your password.', 200);
     }
@@ -176,6 +174,6 @@ class AuthService extends Service
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL()
-            ]);
+        ]);
     }
 }
