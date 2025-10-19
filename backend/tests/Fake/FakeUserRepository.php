@@ -44,4 +44,13 @@ class FakeUserRepository implements UserRepositoryInterface
 
         return $dataModel;
     }
+
+    public function findByEmail(string $email): ?User
+    {
+        $user = array_filter($this->users, fn(User $user) => $user->getEmail() === $email);
+        if (!$user)
+            return null;
+        $user = $user[0];
+        return $user ? User::FromArray($user->toArray()) : null;
+    }
 }
