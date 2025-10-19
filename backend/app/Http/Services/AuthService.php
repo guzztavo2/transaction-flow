@@ -2,13 +2,9 @@
 
 namespace App\Http\Services;
 
-use App\Entities\AccountEntity;
-use App\Entities\UserEntity;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Jobs\ResetPasswordJob;
 use Illuminate\Support\Facades\Redis;
@@ -16,15 +12,18 @@ use App\Domain\Actions\User\CreateUserAction;
 use App\Domain\Actions\Account\CreateAccountAction;
 use App\Domain\DTOs\UserData;
 use App\Domain\DTOs\AccountData;
-use App\Domain\Entities\User as UserEntityM;
-use App\Domain\Entities\Account as AccountEntityM;
+use App\Domain\Actions\User\LoginUser;
 
 class AuthService extends Service
 {
     private int $TOKEN_MAX_SECONDS = 7200;  // 7200 Sec = 2 HOURS
     private const RECOVERY_PASSWORD_TOKEN_HOUR = 2;
 
-    public function __construct(private CreateUserAction $createUserAction, private CreateAccountAction $createAccountAction) {}
+    public function __construct(
+        private CreateUserAction $createUserAction,
+        private CreateAccountAction $createAccountAction,
+        private LoginUser $loginUser
+    ) {}
     public function register(Request $request)
     {
         $request->validate([
@@ -40,23 +39,15 @@ class AuthService extends Service
         $user = ($this->createUserAction)(new UserData(null, $request['name'], $request['email'], $request['password'], null, null));
         $account = ($this->createAccountAction)(new AccountData(null, $request['bank'], $request['agency'], $request['number_account'], 0, true, $user->getId()));
 
-        return response()->json(['name' => $user->getName(), 'email' => $user->getEmail(), 'bank' => $account->getBank(), 'agency' => $account->getAgency(), 'number_account' => $account->getNumberAccount(), 'balance' => $account->getBalance()], 200);
+        return response()->json(['name' => $user->getName(), 'email' => $user->getEmail(), 'bank' => $account->getBank(), 'agency' => $account->getAgency(), 'number_account' => $account->getNumberAccount(), 'balance' => $account->getBalance()->format()], 200);
     }
 
     public function login(Request $request)
     {
         $request->validate(['email' => ['email:strict,dns,spoof', 'required', 'max:100', 'string'], 'password' => ['required', 'max:100', 'string'], 'remember' => ['nullable', 'boolean']]);
-
-        $credentials = $request->only(['email', 'password']);
-        $user = User::where('email', $request->email)->first();
-
         $expiresAt = $request->boolean('remember') ? 60 * 24 * 7 : 60 * 4; //time in minutes
-        $this->TOKEN_MAX_SECONDS = $expiresAt * 60; // converted to seconds
-
-        if (!$token = auth('api')->setTTL($this->TOKEN_MAX_SECONDS)->attempt($credentials))
+        if (!$token = ($this->loginUser)($request->email, $request->password, $expiresAt))
             return response()->json(['error' => 'Unauthorized'], 401);
-
-        Redis::setex("user:{$user->id}:session", $this->TOKEN_MAX_SECONDS, $token);
         return $this->respondWithToken($token);
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Domain\DTOs;
+use App\Domain\ValueObjects\Money;
 
 final class AccountData
 {
@@ -10,10 +11,12 @@ final class AccountData
         private string $bank,
         private string $agency,
         private string $number_account,
-        private string $balance,
+        private Money|string $balance,
         private bool $is_default = false,
         private int $user_id
-    ) {}
+    ) {
+        $this->setBalance($balance);
+    }
 
     #Setters
 
@@ -37,9 +40,12 @@ final class AccountData
         $this->number_account = $number_account;
     }
 
-    public function setBalance(string $balance): void
+    public function setBalance(string|Money $balance): void
     {
-        $this->balance = $balance;
+        if($balance instanceof Money)
+            $this->balance = $balance;
+        else
+            $this->balance = new Money($balance);
     }
 
     public function setIsDefault(string $is_default): void
@@ -73,7 +79,7 @@ final class AccountData
         return $this->number_account;
     }
 
-    public function getBalance(): string
+    public function getBalance(): Money
     {
         return $this->balance;
     }

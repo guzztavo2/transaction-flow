@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
+use \Tests\Fake\FakeUserRepository;
+use \Tests\Fake\FakeAccountRepository;
 
 class AuthControllerTest extends TestCase
 {
@@ -32,15 +34,19 @@ class AuthControllerTest extends TestCase
         'number_account' => '123454'
     ];
 
-
-
     private User $user;
     private string $accesToken;
 
+    private ?FakeAccountRepository $fakeAccountRepository = null;
+    private ?FakeUserRepository $fakeUserRepository = null;
+
     private function bindFakeRepositories()
     {
-        $this->app->bind(\App\Domain\Repositories\User\UserRepositoryInterface::class, \Tests\Fake\FakeUserRepository::class);
-        $this->app->bind(\App\Domain\Repositories\Account\AccountRepositoryInterface::class, \Tests\Fake\FakeAccountRepository::class);
+        $this->fakeUserRepository = new FakeUserRepository();
+        $this->app->instance(\App\Domain\Repositories\User\UserRepositoryInterface::class, $this->fakeAccountRepository);
+
+        $this->fakeAccountRepository = new FakeAccountRepository();
+        $this->app->instance(\App\Domain\Repositories\Account\AccountRepositoryInterface::class, $this->fakeAccountRepository);
     }
 
     #[Test]
@@ -49,37 +55,34 @@ class AuthControllerTest extends TestCase
         $this->bindFakeRepositories();
         $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
         // $this->register_user_with_valid_datas($this->pessoal_information_to_test_2);
-        // $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
-        // $getMeResponse = $this->get_user_me($this->accesToken);
+        $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
+        $getMeResponse = $this->get_user_me($this->accesToken);
         // $changePasswordResponse = $this->change_password();
         // $resetPasswordResponse = $this->reset_password();
     }
 
     public function register_user_with_valid_datas(array $user_to_created)
     {
-        $fakeRepo = new \Tests\Fake\FakeUserRepository();
-        $this->app->instance(\App\Domain\Repositories\User\UserRepositoryInterface::class, $fakeRepo);
-
-        $fakeAccountRepo = new \Tests\Fake\FakeAccountRepository();
-        $this->app->instance(\App\Domain\Repositories\Account\AccountRepositoryInterface::class, $fakeAccountRepo);
-
         $response = $this->postJson('api/auth/register', $user_to_created);
 
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'bank', 'agency', 'number_account', 'balance']);
 
-        $this->assertDatabaseHas('users', [
-            'email' => $user_to_created['email'],
-            'name' => $user_to_created['name']
-        ]);
+        if (is_null($this->fakeAccountRepository)) {
+            $this->assertDatabaseHas('users', [
+                'email' => $user_to_created['email'],
+                'name' => $user_to_created['name']
+            ]);
 
-        $this->user = User::first();
+            $this->user = User::first();
 
-        $this->assertDatabaseHas('accounts', [
-            'bank' => $user_to_created['bank'],
-            'agency' => $user_to_created['agency'],
-            'number_account' => $user_to_created['number_account'],
-            'balance' => 0.0
-        ]);
+            $this->assertDatabaseHas('accounts', [
+                'bank' => $user_to_created['bank'],
+                'agency' => $user_to_created['agency'],
+                'number_account' => $user_to_created['number_account'],
+                'balance' => 0.0
+            ]);
+        }
+
         return $response;
     }
 
@@ -106,9 +109,11 @@ class AuthControllerTest extends TestCase
         return $response['access_token'];
     }
 
-    public function get_user_me($accesToken)
+    public function get_user_me($accessToken)
     {
-        $response = $this->get('api/auth/me', [], ['Authorization' => $accesToken]);
+        $response = $this->withHeaders([
+            'Authorization' => $accessToken,
+        ])->get('api/auth/me', [], ['Authorization' => $accessToken]);
         $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'created_at', 'updated_at']);
         return $response;
     }

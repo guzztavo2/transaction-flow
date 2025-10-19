@@ -4,33 +4,27 @@ namespace App\Domain\Entities;
 
 use InvalidArgumentException;
 use App\Domain\DTOs\AccountData;
-use App\Exceptions\UserNotFound;
+use App\Domain\ValueObjects\Money;
 
 final class Account
 {
 
-    public function __construct(private AccountData $data)
+    public function __construct(private AccountData $data) {}
+
+    public function credit(string|Money $amount)
     {
-        $this->check_balance();
+        if (! $amount instanceof Money)
+            $amount = new Money($amount);
+
+        $this->data->setBalance($this->getBalance()->add($amount));
     }
 
-    public function check_balance()
+    public function debit(string|Money $amount)
     {
-        if (bccomp($this->data->getBalance(), '0', 2) < 0)
-            throw new InvalidArgumentException('Balance dont be negative.');
-    }
+        if (! $amount instanceof Money)
+            $amount = new Money($amount);
 
-    public function credit(string $amount)
-    {
-        $this->data->setBalance(bcadd($this->data->getBalance(), $amount, 2));
-    }
-
-    public function debit(string $amount)
-    {
-        if (bccomp($this->data->getBalance(), $amount, 2) < 0)
-            throw new \RuntimeException('Insufficient balance');
-
-        $this->data->setBalance(bcsub($this->data->getBalance(), $amount, 2));
+        $this->data->setBalance($this->getBalance()->subtract($amount));
     }
 
     public function toArray(): array
