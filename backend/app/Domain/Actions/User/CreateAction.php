@@ -6,7 +6,7 @@ use App\Domain\DTOs\UserData;
 use App\Domain\Entities\User;
 use App\Domain\Repositories\User\UserRepositoryInterface;
 
-class CreateUserAction
+class CreateAction
 {
     public function __construct(private UserRepositoryInterface $repo) {}
 

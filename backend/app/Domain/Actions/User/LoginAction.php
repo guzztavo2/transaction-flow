@@ -3,10 +3,9 @@
 namespace App\Domain\Actions\User;
 
 use App\Domain\Repositories\User\UserRepositoryInterface;
-use App\Domain\Entities\User;
 use Illuminate\Support\Facades\Redis;
 
-class LoginUser
+class LoginAction
 {
     public function __construct(private UserRepositoryInterface $repo) {}
 

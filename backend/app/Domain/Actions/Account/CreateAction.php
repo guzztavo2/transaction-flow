@@ -7,7 +7,7 @@ use App\Domain\Entities\Account;
 use App\Domain\Repositories\Account\AccountRepositoryInterface;
 use App\Exceptions\AccountAlreadyExists;
 
-class CreateAccountAction
+class CreateAction
 {
     public function __construct(private AccountRepositoryInterface $repo) {}
 
