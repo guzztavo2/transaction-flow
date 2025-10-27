@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,11 +13,15 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
-        $this->app->bind(\App\Domain\Repositories\Account\AccountRepositoryInterface::class,
-        \App\Domain\Repositories\Account\EloquentAccountRepository::class);
+        $this->app->bind(
+            \App\Domain\Repositories\Account\AccountRepositoryInterface::class,
+            \App\Domain\Repositories\Account\EloquentAccountRepository::class
+        );
 
-        $this->app->bind(\App\Domain\Repositories\User\UserRepositoryInterface::class, 
-            \App\Domain\Repositories\User\EloquentUserRepository::class);
+        $this->app->bind(
+            \App\Domain\Repositories\User\UserRepositoryInterface::class,
+            \App\Domain\Repositories\User\EloquentUserRepository::class
+        );
     }
 
     /**
@@ -24,6 +29,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        self::eventAccountListeners();
+    }
+
+    private static function eventAccountListeners(): void
+    {
+        Event::listen(
+            \App\Domain\Events\AccountCreated::class,
+            [\App\Domain\Listeners\Account\SendWelcomeEmail::class, 'handle']
+        );
+
+        Event::listen(
+            \App\Domain\Events\AccountCreated::class,
+            [\App\Domain\Listeners\Account\CreatedLog::class, 'handle']
+        );
     }
 }

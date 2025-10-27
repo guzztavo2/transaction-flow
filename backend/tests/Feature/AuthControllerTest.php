@@ -12,7 +12,7 @@ use \Tests\Fake\FakeAccountRepository;
 
 class AuthControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     private array $pessoal_information_to_test = [
         'name' => 'Fulano de Tal',
@@ -52,13 +52,13 @@ class AuthControllerTest extends TestCase
     #[Test]
     public function test_all_routes_auth_controller()
     {
-        $this->bindFakeRepositories();
+        // $this->bindFakeRepositories();
         $registerResponse = $this->register_user_with_valid_datas($this->pessoal_information_to_test);
         // $this->register_user_with_valid_datas($this->pessoal_information_to_test_2);
         $this->accesToken = $this->login_user_with_valid_data($this->pessoal_information_to_test);
         $getMeResponse = $this->get_user_me($this->accesToken);
-        // $changePasswordResponse = $this->change_password();
-        // $resetPasswordResponse = $this->reset_password();
+        $changePasswordResponse = $this->change_password();
+        $resetPasswordResponse = $this->reset_password();
     }
 
     public function register_user_with_valid_datas(array $user_to_created)
@@ -180,7 +180,7 @@ class AuthControllerTest extends TestCase
 
         $userFromDb = User::where('email', $this->pessoal_information_to_test['email'])->first();
 
-        $notification = $userFromDb->notifications()->get()->last();
+        $notification = $userFromDb->notifications()->where('type', \App\Notifications\ResetPassword::class)->get()->last();
         $token = $notification->data['token'];
 
         $this->change_password_with_token($token);

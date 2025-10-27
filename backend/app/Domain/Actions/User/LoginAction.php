@@ -9,7 +9,7 @@ class LoginAction
 {
     public function __construct(private UserRepositoryInterface $repo) {}
 
-    public function __invoke(string $email, string $password, int $expiresAt,): false|string
+    public function __invoke(string $email, string $password, int $expiresAt): false|string
     {
         $credentials = ['email' => $email, 'password' => $password];
         $user = $this->repo->findByEmail($email);

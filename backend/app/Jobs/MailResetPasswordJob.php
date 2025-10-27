@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\User;
 
-class ResetPasswordJob implements ShouldQueue
+class MailResetPasswordJob implements ShouldQueue
 {
     use Queueable;
 
@@ -15,7 +15,7 @@ class ResetPasswordJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(int $userId, int $RECOVERY_PASSWORD_TOKEN_HOUR = null)
+    public function __construct(int $userId, ?int $RECOVERY_PASSWORD_TOKEN_HOUR = null)
     {
         $this->userId = $userId;
         $this->RECOVERY_PASSWORD_TOKEN_HOUR = $RECOVERY_PASSWORD_TOKEN_HOUR;

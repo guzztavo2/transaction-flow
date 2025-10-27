@@ -28,24 +28,24 @@ class ProcessTransaction implements ShouldQueue
     public function handle(): void
     {
         $transaction = Transaction::find($this->transactionId);
-        if(!$transaction)
+        if (!$transaction)
             throw new \Exception("Transaction not found");
-        
-        if($this->attempts() >= ($this->tries - 1)){
+
+        if ($this->attempts() >= ($this->tries - 1)) {
             throw new \Exception("Max attempts reached");
         }
         if ($transaction->scheduled_at && $transaction->scheduled_at->isFuture()) {
             $this->release(60);
             return;
         }
-        
+
         TransactionEntity::process($transaction);
     }
 
     public function failed(\Throwable $exception): void
     {
         $transaction = Transaction::find($this->transactionId);
-        
+
         if ($transaction) {
             $transaction->update(['status' => Transaction::STATUS_FAIL]);
             TransactionLogEntity::create("ERROR TRANSACTION - TYPE: {$transaction->get_type()} STATUS: {$transaction->get_status()}, AMOUNT: $transaction->amount - ERROR: {$exception->getMessage()}", $transaction);
