@@ -8,7 +8,8 @@ use Illuminate\Foundation\Queue\Queueable;
 use App\Models\Account as AccountModel;
 use App\Domain\Entities\Account;
 
-class MailWelcomeAccountJob implements ShouldQueue
+
+class NotificationWelcomeAccountJob implements ShouldQueue
 {
     use Queueable;
 

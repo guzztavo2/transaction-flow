@@ -31,7 +31,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
 
         return User::fromArray($model->getAttributes());
     }
-    
+
     public function findByEmail(string $email): ?User
     {
         $data = UserModel::where('email', $email)->first();

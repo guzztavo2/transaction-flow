@@ -92,8 +92,9 @@ class AuthService extends Service
         ]);
 
         if (!empty($token))
-            return ($this->updatePasswordWithTokenAction)->execute(urldecode($request->email), $token, $request->password, $request->new_password);
-
+            if (($this->updatePasswordWithTokenAction)->execute($token, $request->password, $request->new_password))
+                return response()->json('Password updated successfully.', 200);
+        
         $this->updatePasswordAction->execute(null, $request->new_password, $request->password);
 
         return $this->refresh($request);

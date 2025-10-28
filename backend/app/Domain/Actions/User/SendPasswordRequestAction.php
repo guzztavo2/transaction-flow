@@ -3,7 +3,7 @@
 namespace App\Domain\Actions\User;
 
 use App\Domain\Repositories\User\UserRepositoryInterface;
-use App\Jobs\MailResetPasswordJob;
+use App\Jobs\NotificationResetPasswordJob;
 
 class SendPasswordRequestAction
 {
@@ -12,7 +12,7 @@ class SendPasswordRequestAction
     public function __invoke(string $email, int $RECOVERY_PASSWORD_TOKEN_HOUR)
     {
         $user = $this->repo->findByEmail($email);
-        MailResetPasswordJob::dispatch($user->getId(), $RECOVERY_PASSWORD_TOKEN_HOUR);
+        NotificationResetPasswordJob::dispatch($user->getId(), $RECOVERY_PASSWORD_TOKEN_HOUR);
         return $this->repo->save($user);
     }
 }

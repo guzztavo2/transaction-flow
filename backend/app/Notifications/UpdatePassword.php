@@ -5,15 +5,14 @@ namespace App\Notifications;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
-use App\Domain\Entities\Account;
 
-class WelcomeAccount extends Notification
+class UpdatePassword extends Notification
 {
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(private Account $account) {}
+    public function __construct() {}
 
     /**
      * Get the notification's delivery channels.
@@ -31,12 +30,9 @@ class WelcomeAccount extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Account created with suscess!')
-            ->line("Hello " . Str::title($notifiable->name) . ",")
-            ->line("We are happy to inform you that your account has been successfully created..")
-            ->line("Now you can start using our services and enjoy all the benefits we offer.")
-            ->line($this->account->getIsDefault() ? "Your account is the default account for transactions and access" : "Your account is not the default account for transactions and access")
-            ->line("Your account has the value of: " . $this->account->getBalance()->format());
+            ->subject('Atualização de Senha')
+            ->line('Seu usuário teve a senha alterada com sucesso.')
+            ->line('Obrigado por usar nossa aplicação!');
     }
 
     /**
