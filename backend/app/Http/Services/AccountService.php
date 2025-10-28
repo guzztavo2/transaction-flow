@@ -42,9 +42,11 @@ class AccountService extends Service
 
     public function store(Request $request)
     {
-        $request->validate(['bank' => ['required', 'max:100', 'string'],
+        $request->validate([
+            'bank' => ['required', 'max:100', 'string'],
             'agency' => ['required', 'max:100', 'string'],
-            'number_account' => ['required', 'max:100', 'string']]);
+            'number_account' => ['required', 'max:100', 'string']
+        ]);
 
         $accountToBeCreated = array_filter([
             'bank' => $request['bank'],
@@ -55,17 +57,24 @@ class AccountService extends Service
         if (self::checkAccountExists($accountToBeCreated))
             return response()->json(['error' => true, 'message' => 'Fields already exists in account!']);
 
-        $account = AccountEntity::create($request['bank'],
-            $request['agency'], $request['number_account'],
-            0, $request['is_default'] ?? false, $this->user);
+        $account = AccountEntity::create(
+            $request['bank'],
+            $request['agency'],
+            $request['number_account'],
+            0,
+            $request['is_default'] ?? false,
+            $this->user
+        );
         return response()->json($account, 200);
     }
 
     public function update(Request $request, string $id)
     {
-        $request->validate(['bank' => ['nullable', 'max:100', 'string'],
+        $request->validate([
+            'bank' => ['nullable', 'max:100', 'string'],
             'agency' => ['nullable', 'max:100', 'string'],
-            'number_account' => ['nullable', 'max:100', 'string']]);
+            'number_account' => ['nullable', 'max:100', 'string']
+        ]);
 
         $account = $this->accountByUser()->where('id', $id)->firstOrFail();
 
@@ -111,9 +120,11 @@ class AccountService extends Service
             if ($account_fields['number_account'])
                 $b->where('number_account', $account_fields['number_account']);
         })->first())
-            if ($accountExisted->bank == $account_fields['bank'] &&
+            if (
+                $accountExisted->bank == $account_fields['bank'] &&
                 $accountExisted->agency == $account_fields['agency'] &&
-                $accountExisted->number_account == $account_fields['number_account'])
+                $accountExisted->number_account == $account_fields['number_account']
+            )
                 return true;
         return false;
     }

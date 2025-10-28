@@ -23,7 +23,7 @@ class AuthController extends Controller
         return $this->service->login($request);
     }
 
-    public function changePassword(Request $request, string $token = null)
+    public function changePassword(Request $request, ?string $token = null)
     {
         return $this->service->changePassword($request, $token);
     }

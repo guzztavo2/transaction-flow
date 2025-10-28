@@ -31,7 +31,8 @@ class Account extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime:d-m-Y H:i:s'
+            'created_at' => 'datetime:d-m-Y H:i:s',
+            'balance' => \App\Casts\MoneyCast::class
         ];
     }
 

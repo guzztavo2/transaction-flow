@@ -2,23 +2,22 @@
 
 namespace App\Jobs;
 
-use App\Notifications\ResetPassword;
+use App\Notifications\UpdatePassword;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\User;
 
-class ResetPasswordJob implements ShouldQueue
+class NotificationUpdatedPasswordJob implements ShouldQueue
 {
     use Queueable;
 
-    private int $userId, $RECOVERY_PASSWORD_TOKEN_HOUR;
+    private int $userId;
     /**
      * Create a new job instance.
      */
-    public function __construct(int $userId, int $RECOVERY_PASSWORD_TOKEN_HOUR = null)
+    public function __construct(int $userId)
     {
         $this->userId = $userId;
-        $this->RECOVERY_PASSWORD_TOKEN_HOUR = $RECOVERY_PASSWORD_TOKEN_HOUR;
     }
 
     /**
@@ -29,6 +28,6 @@ class ResetPasswordJob implements ShouldQueue
         $user = User::find($this->userId);
         if (!$user) return;
 
-        $user->notify(new ResetPassword($this->RECOVERY_PASSWORD_TOKEN_HOUR));
+        $user->notify(new UpdatePassword());
     }
 }
