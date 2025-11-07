@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Domain\DTOs;
+use Carbon\Carbon;
 
 final class UserData
 {
@@ -10,8 +11,8 @@ final class UserData
         private string $name,
         private string $email,
         private string $password,
-        private ?string $created_at = null,
-        private ?string $updated_at = null
+        private ?Carbon $created_at = null,
+        private ?Carbon $updated_at = null
     ) {}
 
     public function getId(): int|null
@@ -32,11 +33,11 @@ final class UserData
     {
         return $this->password;
     }
-    public function getCreatedAt(): string|null
+    public function getCreatedAt(): Carbon|null
     {
         return $this->created_at;
     }
-    public function getUpdatedAt(): string|null
+    public function getUpdatedAt(): Carbon|null
     {
         return $this->updated_at;
     }
@@ -61,12 +62,12 @@ final class UserData
         $this->password = $password;
     }
 
-    public function setCreatedAt(?string $created_at = null): void
+    public function setCreatedAt(?Carbon $created_at = null): void
     {
         $this->created_at = $created_at;
     }
 
-    public function setUpdatedAt(?string $updated_at = null): void
+    public function setUpdatedAt(?Carbon $updated_at = null): void
     {
         $this->updated_at = $updated_at;
     }

@@ -4,7 +4,7 @@ namespace App\Domain\Actions\User;
 
 use App\Domain\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Redis;
-
+use App\Domain\Events\UserLogin;
 class LoginAction
 {
     public function __construct(private UserRepositoryInterface $repo) {}
@@ -19,6 +19,7 @@ class LoginAction
             return false;
 
         Redis::setex("user:{$user->getId()}:session", $expirestAtSeconds, $token);
+        new UserLogin($user);
         return $token;
     }
 }

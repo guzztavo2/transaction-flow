@@ -3,15 +3,14 @@
 namespace App\Domain\Entities;
 
 use App\Domain\DTOs\UserData;
+use App\Models\User as UserModel;
 
 final class User
 {
-
     public function __construct(private UserData $data) {}
 
     public function toArray(): array
     {
-
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
@@ -24,9 +23,27 @@ final class User
 
     public static function fromArray(array $data)
     {
-        return new self((new UserData($data['id'] ?? null, $data['name'], $data['email'], $data['password'], $data['created_at'] ?? null, $data['updated_at'] ?? null)));
+        return new self((new UserData(
+            $data['id'] ?? null,
+            $data['name'],
+            $data['email'],
+            $data['password'],
+            $data['created_at'] ?? null,
+            $data['updated_at'] ?? null
+        )));
     }
 
+    public static function fromModel(UserModel $model): self
+    {
+        return new self((new UserData(
+            $model->id,
+            $model->name,
+            $model->email,
+            $model->password,
+            $model->created_at?->toDateTimeString(),
+            $model->updated_at?->toDateTimeString()
+        )));
+    }
     public function getId(): int|null
     {
         return $this->data->getId();

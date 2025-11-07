@@ -52,9 +52,20 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\Events\UserPasswordUpdated::class,
             [\App\Domain\Listeners\User\SendUpdatedPasswordNotification::class, 'handle']
         );
+
         Event::listen(
             \App\Domain\Events\UserPasswordUpdated::class,
             [\App\Domain\Listeners\User\LogUserUpdatedPassword::class, 'handle']
+        );
+
+        Event::listen(
+            \App\Domain\Events\UserLogin::class,
+            [\App\Domain\Listeners\User\LogLogin::class, 'handle']
+        );
+
+        Event::listen(
+            \App\Domain\Events\UserLogin::class,
+            [\App\Domain\Listeners\User\LastLoginUpdate::class, 'handle']
         );
     }
 }

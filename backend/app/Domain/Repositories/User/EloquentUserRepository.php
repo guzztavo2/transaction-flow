@@ -40,4 +40,15 @@ final class EloquentUserRepository implements UserRepositoryInterface
 
         return User::fromArray($data->getAttributes());
     }
+
+    public function updateLastLogin(User $user): ?User
+    {
+        $user = UserModel::find($user->getId());
+        if (!$user)
+            throw new UnauthorizedException('User id not found.');
+
+        $user->update(['last_login' => now()]);
+
+        return User::fromArray($user->getAttributes());
+    }
 }

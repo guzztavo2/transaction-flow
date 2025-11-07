@@ -24,6 +24,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'is_admin',
+        'last_login'
     ];
 
     /**
@@ -46,6 +47,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'created_at' => 'datetime:d/m/Y H:i:s',
             'updated_at' => 'datetime:d/m/Y H:i:s',
+            'last_login' => 'datetime:d/m/Y H:i:s',
             'password' => 'hashed',
             'is_admin' => 'boolean'
         ];

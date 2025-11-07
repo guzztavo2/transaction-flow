@@ -20,6 +20,10 @@ class CreateAction
             'updated_at' => $user->getUpdatedAt(),
         ]);
 
-        return $this->repo->save($user);
+        if($this->repo->save($user)){
+            new \App\Domain\Events\CreateUser($user);
+            return $user;
+        }
+        return null;
     }
 }
